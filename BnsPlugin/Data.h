@@ -3,12 +3,24 @@
 
 #pragma pack(push, 1)
 
-class DrTable {
-public:
-	void* __vftable;
+struct DrAliasMap
+{
+	void* __vftable /*VFT*/;
 };
 
-class DrDataTable : public DrTable
+struct DrDataTable;
+struct /*VFT*/ DrDataTable_vtbl
+{
+	char padding[0xB0];
+	_DrEl* (__fastcall* Find)(DrDataTable* thisptr, const wchar_t*, const DrAliasMap*);
+	_DrEl* (__fastcall* Find)(DrDataTable* thisptr, unsigned __int64);
+	void(__fastcall* SetUseLowMemory)(DrDataTable* thisptr, bool);
+	DrInnerIter* (__fastcall* createInnerIter)(DrDataTable* thisptr, _DrEl* const);
+	DrInnerIter* (__fastcall* createInnerIter)(DrDataTable* thisptr);
+	void(__fastcall* removeInnerIter)(DrDataTable* thisptr, DrInnerIter*);
+};
+
+struct DrDataTable
 {
 };
 

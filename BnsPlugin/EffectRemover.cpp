@@ -1,5 +1,6 @@
 #include "EffectRemover.h"
 #include "Hooks.h"
+#include <iostream>
 
 EffectRemover::EffectRemover(__int64 const* dataManagerPtr) : dataManagerPtr(dataManagerPtr) {
 }
@@ -62,6 +63,51 @@ void EffectRemover::RemoveEffectsForIds(DrDataTable* table, const std::unordered
 	DataHelper::FreeDrElIter(it);
 }
 
+__int32* counterIdPtr = nullptr;
+
+static bool RemoveTest(const DrDataTable* const table, const std::unordered_set<int>& ids) {
+	if (!table) return false;
+	auto it = DataHelper::DrElIter_DrElIter();
+	oDrElIter_DrElIter(it, table);
+	/*do {
+		(Data::Skillshow3Record*)it->_node->_vtptr->Ptr(it->_node)->_el;
+	} while (it->_node->_vtptr->Next(it->_node));
+	oDrElIter_DrElIter(it, table);*/
+	while (it->_node->_vtptr->IsValid(it->_node)) {
+		auto recordBase = it->_node->_vtptr->Ptr(it->_node);
+		if (recordBase == nullptr) continue;
+		std::wcout << L"Found record: " << recordBase << std::endl;
+		it->_node->_vtptr->Next(it->_node);
+	}
+	/*do {
+		if (it->_node->_vtptr->IsValid(it->_node) == false) {
+			continue;
+		}
+		auto baseRecord = it->_node->_vtptr->Ptr(it->_node);
+		if (counterIdPtr != nullptr && *counterIdPtr != 190060) {
+			std::wcout << L"Found the fucker: " << *counterIdPtr << std::endl;
+		}
+		if (baseRecord == nullptr) continue;
+		auto record = (Data::Skillshow3Record*)baseRecord;
+		if (record == nullptr) continue;
+		if (ids.contains(record->key.id)) {
+			uintptr_t uintptr = reinterpret_cast<uintptr_t>(record);
+			counterIdPtr = reinterpret_cast<__int32*>(uintptr + 8);
+			std::wcout << L"Found record: " << record->key.id << std::endl;
+			printf("Address of %s is %p\n", "record", (void*)record);
+			std::cout << std::endl;
+			if (record->exec_show_1 != nullptr) {
+				*record->exec_show_1 = L'\0';
+			}
+		}
+		if (record->key.id == 5902271) {
+			std::wcout << L"Found record: " << record->key.id << std::endl;
+		}
+	} while (it->_node->_vtptr->Next(it->_node));*/
+	DataHelper::FreeDrElIter(it);
+	return true;
+}
+
 bool EffectRemover::RemoveEffects() {
 	if (this->dataManagerPtr == nullptr || *this->dataManagerPtr == NULL) {
 		return false;
@@ -72,7 +118,8 @@ bool EffectRemover::RemoveEffects() {
 		return false;
 	}
 	const std::unordered_set<int> ids = { 190060 }; //TODO: get for classes
-	RemoveEffectsForIds(table, ids);
+	RemoveTest(table, ids);
+	//RemoveEffectsForIds(table, ids);
 	return true;
 }
 
@@ -85,5 +132,5 @@ void EffectRemover::RestoreEffects() {
 	if (table == nullptr) {
 		return;
 	}
-	RestoreAllSkillShow3Records(table);
+	//RestoreAllSkillShow3Records(table);
 }
