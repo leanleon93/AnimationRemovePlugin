@@ -1,8 +1,18 @@
 #include "EffectRemover.h"
 #include "Hooks.h"
 #include <iostream>
+#include "./Records/Job/JobRecordBase.h"
+#include <iostream>
+#include <fstream>
+#include <nlohmann/json.hpp>
+#include <cstdlib>
+#include "AnimFilterConfig.h"
+#include "SkillIdJson.h"
 
-EffectRemover::EffectRemover(__int64 const* dataManagerPtr) : dataManagerPtr(dataManagerPtr) {
+using json = nlohmann::json;
+
+EffectRemover::EffectRemover(__int64 const* dataManagerPtr) : dataManagerPtr(dataManagerPtr)
+{
 }
 
 void EffectRemover::TrySetWcharEmpty(const Data::Skillshow3Record::Key& recordKey, wchar_t* attribute, std::wstring const& attributeName)
@@ -22,11 +32,10 @@ void EffectRemover::TrySetWcharEmpty(const Data::Skillshow3Record::Key& recordKe
 	}
 }
 
-void EffectRemover::RestoreAllSkillShow3Records(DrDataTable const* table) {
-	auto it = DataHelper::DrElIter_DrElIter();
-	oDrElIter_DrElIter(it, table);
+void EffectRemover::RestoreAllSkillShow3Records(DrDataTable* table) {
+	auto it = table->__vftable->createInnerIter_d0(table);
 	do {
-		auto record = (Data::Skillshow3Record*)it->_node->_vtptr->Ptr(it->_node);
+		auto record = (Data::Skillshow3Record*)it->_vtptr->Ptr(it);
 		if (record == nullptr) continue;
 		auto outerIt = skillShowRestorationMap.find(record->key.key);
 		if (outerIt != skillShowRestorationMap.end()) {
@@ -38,8 +47,8 @@ void EffectRemover::RestoreAllSkillShow3Records(DrDataTable const* table) {
 				}
 			}
 		}
-	} while (it->_node->_vtptr->Next(it->_node));
-	DataHelper::FreeDrElIter(it);
+	} while (it->_vtptr->Next(it));
+	table->__vftable->removeInnerIter(table, it);
 	for (auto& [attributeName, value] : skillShowRestorationMap) {
 		value.clear();
 	}
@@ -51,60 +60,49 @@ void EffectRemover::RemoveEffectEntriesFromSkillshow3(Data::Skillshow3Record* re
 }
 
 void EffectRemover::RemoveEffectsForIds(DrDataTable* table, const std::unordered_set<int>& ids) {
-	auto it = DataHelper::DrElIter_DrElIter();
-	oDrElIter_DrElIter(it, table);
+	auto it = table->__vftable->createInnerIter_d0(table);
 	do {
-		auto record = (Data::Skillshow3Record*)it->_node->_vtptr->Ptr(it->_node);
+		auto record = (Data::Skillshow3Record*)it->_vtptr->Ptr(it);
 		if (record == nullptr) continue;
 		if (ids.contains(record->key.id)) {
 			RemoveEffectEntriesFromSkillshow3(record);
 		}
-	} while (it->_node->_vtptr->Next(it->_node));
-	DataHelper::FreeDrElIter(it);
+	} while (it->_vtptr->Next(it));
+	table->__vftable->removeInnerIter(table, it);
 }
 
-__int32* counterIdPtr = nullptr;
+__int64 EffectRemover::BuildKey(__int32 id_, __int16 variation_id_, __int16 skillskin_id_) {
+	Data::Skillshow3Record::Key key{};
+	key.id = id_;
+	key.variation_id = variation_id_;
+	key.skillskin_id = skillskin_id_;
+	return std::bit_cast<__int64>(key);
+}
 
-static bool RemoveTest(const DrDataTable* const table, const std::unordered_set<int>& ids) {
+Data::Skillshow3Record::Key EffectRemover::ExtractKey(__int64 key) {
+	Data::Skillshow3Record::Key parts{};
+	parts.key = key;
+	return parts;
+}
+
+static bool RemoveTest(DrDataTable* const table, const std::unordered_set<int>& ids) {
 	if (!table) return false;
-	auto it = DataHelper::DrElIter_DrElIter();
-	oDrElIter_DrElIter(it, table);
-	/*do {
-		(Data::Skillshow3Record*)it->_node->_vtptr->Ptr(it->_node)->_el;
-	} while (it->_node->_vtptr->Next(it->_node));
-	oDrElIter_DrElIter(it, table);*/
-	while (it->_node->_vtptr->IsValid(it->_node)) {
-		auto recordBase = it->_node->_vtptr->Ptr(it->_node);
-		if (recordBase == nullptr) continue;
-		std::wcout << L"Found record: " << recordBase << std::endl;
-		it->_node->_vtptr->Next(it->_node);
-	}
-	/*do {
-		if (it->_node->_vtptr->IsValid(it->_node) == false) {
-			continue;
-		}
-		auto baseRecord = it->_node->_vtptr->Ptr(it->_node);
-		if (counterIdPtr != nullptr && *counterIdPtr != 190060) {
-			std::wcout << L"Found the fucker: " << *counterIdPtr << std::endl;
-		}
-		if (baseRecord == nullptr) continue;
-		auto record = (Data::Skillshow3Record*)baseRecord;
-		if (record == nullptr) continue;
-		if (ids.contains(record->key.id)) {
-			uintptr_t uintptr = reinterpret_cast<uintptr_t>(record);
-			counterIdPtr = reinterpret_cast<__int32*>(uintptr + 8);
-			std::wcout << L"Found record: " << record->key.id << std::endl;
-			printf("Address of %s is %p\n", "record", (void*)record);
-			std::cout << std::endl;
-			if (record->exec_show_1 != nullptr) {
-				*record->exec_show_1 = L'\0';
-			}
-		}
-		if (record->key.id == 5902271) {
-			std::wcout << L"Found record: " << record->key.id << std::endl;
-		}
-	} while (it->_node->_vtptr->Next(it->_node));*/
-	DataHelper::FreeDrElIter(it);
+	table->__vftable->SetUseLowMemory(table, false);
+	auto builtKey = EffectRemover::BuildKey(190060, 1, 0);
+	auto recordBase = table->__vftable->Find_b8(table, builtKey);
+	auto record = (Data::Skillshow3Record*)recordBase;
+	record->play_player_show = true;
+	builtKey = EffectRemover::BuildKey(231240, 43, 0);
+	recordBase = table->__vftable->Find_b8(table, builtKey);
+	record = (Data::Skillshow3Record*)recordBase;
+	*record->exec_show_1 = L'\0';
+	auto innerIter = table->__vftable->createInnerIter_d0(table);
+	do {
+		if (!innerIter->_vtptr->IsValid(innerIter)) continue;
+		if (auto record = (Data::Skillshow3Record*)innerIter->_vtptr->Ptr(innerIter); record == nullptr) continue;
+		3;
+	} while (innerIter->_vtptr->Next(innerIter));
+	table->__vftable->removeInnerIter(table, innerIter);
 	return true;
 }
 
@@ -133,4 +131,131 @@ void EffectRemover::RestoreEffects() {
 		return;
 	}
 	//RestoreAllSkillShow3Records(table);
+}
+
+//std::unordered_set<Data::JobRecord> EffectRemover::GetJobRecords() {
+//	std::unordered_set<Data::JobRecord> records;
+//	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
+//	const auto jobTable = DataHelper::GetTable(manager, L"job");
+//	if (jobTable == nullptr) {
+//		return records;
+//	}
+//	auto it = jobTable->__vftable->createInnerIter_d0(jobTable);
+//	do {
+//		auto record = (Data::JobRecord*)it->_vtptr->Ptr(it);
+//		if (record == nullptr) continue;
+//		records.insert(*record);
+//	} while (it->_vtptr->Next(it));
+//	return records;
+//}
+
+static std::string GetDocumentsDirectory() {
+	if (const char* userProfile = std::getenv("USERPROFILE"); userProfile != nullptr) {
+		return std::string(userProfile) + "\\Documents";
+	}
+	return "";
+}
+
+//static AnimFilterConfig LoadAnimFilterConfig() {
+//	const auto documentsDirectory = GetDocumentsDirectory();
+//	const auto configPath = documentsDirectory + "\\BnS\\anim_filter_config.json";
+//	std::ifstream file(configPath);
+//	if (!file.is_open()) {
+//		return AnimFilterConfig();
+//	}
+//	json jsonData;
+//	file >> jsonData;
+//
+//	AnimFilterConfig config;
+//
+//	// Iterate over the array of job filters
+//	for (const auto& filter : jsonData["JobFilters"]) {
+//		AnimFilterJobConfig jobConfig;
+//		jobConfig.TechnicalJobName = filter["TechnicalJobName"];
+//		jobConfig.Specs = filter["Specs"].get<std::vector<int>>();
+//		config.JobFilters.push_back(jobConfig);
+//	}
+//
+//	return config;
+//}
+//
+//std::unordered_set<int> GetIdsForSpec(const std::string& technicalName, int specIndex) {
+//}
+//
+//std::unordered_set<int> GetIdsForJob(const AnimFilterJobConfig& jobConfig) {
+//	std::unordered_set<int> ids;
+//	for (const auto& spec : jobConfig.Specs) {
+//		auto specIds = GetIdsForSpec(jobConfig.TechnicalJobName, spec);
+//		ids.insert(specIds.begin(), specIds.end());
+//	}
+//	return ids;
+//}
+
+static SkillIdJson ParseSkillIdJson(const std::string& filename) {
+	std::ifstream file(filename);
+	if (!file.is_open()) {
+		throw std::runtime_error("Failed to open JSON file");
+	}
+
+	json jsonData;
+	file >> jsonData;
+
+	// Parse the json data and populate the SkillIdJson struct
+	SkillIdJson skillIdJson;
+	skillIdJson.Ids = jsonData["Ids"].get<std::vector<int>>();
+
+	return skillIdJson;
+}
+
+const std::vector<int> idExclusionList = {
+	66104,
+	66105,
+	66106,
+	66022,
+	66020,
+	66021,
+	66023,
+	66024,
+	66050
+};
+
+bool EffectRemover::SetupIdsToFilter() {
+	if (this->dataManagerPtr == nullptr || *this->dataManagerPtr == NULL) {
+		return false;
+	}
+	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
+	const auto table = DataHelper::GetTable(manager, L"skillshow3");
+	if (table == nullptr) {
+		return false;
+	}
+	auto multikeytable = (DrMultiKeyTable*)table;
+	const auto tableId = DataHelper::GetTableId(manager, L"skillshow3");
+	if (tableId == 0) {
+		return false;
+	}
+	this->skillshowTableId = tableId;
+	/*for (auto animFilterConfig = LoadAnimFilterConfig(); const auto & jobConfig : animFilterConfig.JobFilters) {
+		auto ids = GetIdsForJob(jobConfig);
+		this->idsToFilter.insert(ids.begin(), ids.end());
+	}*/
+	const auto documentsDirectory = GetDocumentsDirectory();
+	const auto configPath = documentsDirectory + "\\BnS\\binPatches\\out\\skillIds_Zen_Archer.json";
+
+	for (auto skillIdJson = ParseSkillIdJson(configPath); const auto & id : skillIdJson.Ids) {
+		if (std::ranges::find(idExclusionList, id) == idExclusionList.end()) {
+			this->idsToFilter.insert(id);
+		}
+	}
+	return true;
+}
+
+std::unordered_set<int> EffectRemover::GetIdsToFilter() const {
+	return this->idsToFilter;
+}
+
+Data::DataManager* EffectRemover::GetDataManager() {
+	if (this->dataManagerPtr == nullptr || *this->dataManagerPtr == NULL) {
+		return nullptr;
+	}
+	return reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
 }

@@ -125,7 +125,7 @@
     <IntDir>$(SolutionDir)obj\$(ProjectName)\$(Configuration)$(PlatformShortName.ToUpper())\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>false</EmbedManifest>
-    <TargetName>AnimationRemove</TargetName>
+    <TargetName>AnimFilter</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug161|x64'">
     <LinkIncremental />
@@ -133,7 +133,7 @@
     <IntDir>$(SolutionDir)obj\$(ProjectName)\$(Configuration)$(PlatformShortName.ToUpper())\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>false</EmbedManifest>
-    <TargetName>PluginTemplate</TargetName>
+    <TargetName>AnimFilter</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>
@@ -142,7 +142,7 @@
     <IntDir>$(SolutionDir)obj\$(ProjectName)\$(Configuration)$(PlatformShortName.ToUpper())\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>false</EmbedManifest>
-    <TargetName>PluginTemplate</TargetName>
+    <TargetName>AnimFilter</TargetName>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnableManifest>false</VcpkgEnableManifest>
@@ -353,26 +353,36 @@
     <ClCompile Include="deps\Detours\src\disasm.cpp" />
     <ClCompile Include="deps\Detours\src\image.cpp" />
     <ClCompile Include="deps\Detours\src\modules.cpp" />
-    <ClCompile Include="EffectRemover.cpp" />
+    <ClCompile Include="deps\pugixml\pugixml.cpp" />
     <ClCompile Include="Hooks.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="PluginConfig.cpp" />
     <ClCompile Include="PluginEntry.cpp" />
     <ClCompile Include="LeanPlugin.cpp" />
+    <ClCompile Include="SkillIdManager.cpp" />
     <ClCompile Include="versioninfo.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AnimFilterConfig.h" />
     <ClInclude Include="BSFunctions.h" />
     <ClInclude Include="Data.h" />
     <ClInclude Include="DrEl.h" />
-    <ClInclude Include="EffectRemover.h" />
     <ClInclude Include="Hooks.h" />
     <ClInclude Include="patternbyte.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="LeanPlugin.h" />
     <ClInclude Include="PluginConfig.h" />
     <ClInclude Include="Records\Effect\EffectRecordBase.h" />
+    <ClInclude Include="Records\Itemskill\ItemskillRecordBase.h" />
+    <ClInclude Include="Records\Job\JobRecordBase.h" />
+    <ClInclude Include="Records\Skill3\Skill3ActiveSkillRecord.h" />
+    <ClInclude Include="Records\Skill3\Skill3RecordBase.h" />
+    <ClInclude Include="Records\SkillInheritance\SkillInheritanceBase.h" />
     <ClInclude Include="Records\Skillshow3\SkillShow3Base.h" />
+    <ClInclude Include="Records\SkillTrait\SkillTraitRecordBase.h" />
+    <ClInclude Include="Records\Text\TextRecordBase.h" />
+    <ClInclude Include="SkillIdJson.h" />
+    <ClInclude Include="SkillIdManager.h" />
     <ClInclude Include="versioninfo.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

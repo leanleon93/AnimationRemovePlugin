@@ -38,13 +38,7 @@ void BSMessaging::SendGameMessage_s(const wchar_t* text, const wchar_t* particle
 
 void BSMessaging::DisplaySystemChatMessage(const wchar_t* text, bool playSound)
 {
-	//#ifdef _DEBUG
-	//	for (int i = 31; i < 51; i++) {
-	//		std::wstring debugMessage = L"Chat category: " + std::to_wstring(i);
-	//		SendGameMessage_s(debugMessage.c_str(), L"", playSound ? L"00003805.Signal_UI.S_Sys_FindNewSpaceCue" : L"", 0, playSound, false, false, true, i, L"");
-	//	}
-	//#endif
-	SendGameMessage_s(text, L"", playSound ? L"00003805.Signal_UI.S_Sys_FindNewSpaceCue" : L"", 0, playSound, false, false, true, 23, L"");
+	SendGameMessage_s(text, L"", playSound ? L"00003805.Signal_UI.S_Sys_FindNewSpaceCue" : L"", 0, playSound, false, false, true, 22, L"");
 }
 
 void BSMessaging::DisplayScrollingTextHeadline(const wchar_t* text, bool playSound)

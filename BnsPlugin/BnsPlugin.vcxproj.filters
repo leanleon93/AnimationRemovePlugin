@@ -54,7 +54,10 @@
     <ClCompile Include="Data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EffectRemover.cpp">
+    <ClCompile Include="deps\pugixml\pugixml.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SkillIdManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -92,7 +95,34 @@
     <ClInclude Include="Records\Skillshow3\SkillShow3Base.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EffectRemover.h">
+    <ClInclude Include="Records\Job\JobRecordBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimFilterConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SkillIdJson.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SkillIdManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Records\Text\TextRecordBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Records\SkillTrait\SkillTraitRecordBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Records\SkillInheritance\SkillInheritanceBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Records\Skill3\Skill3RecordBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Records\Skill3\Skill3ActiveSkillRecord.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Records\Itemskill\ItemskillRecordBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

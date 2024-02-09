@@ -11,13 +11,11 @@
 #include "Data.h"
 #include "Records/Skillshow3/SkillShow3Base.h"
 #include <functional>
-#include "EffectRemover.h"
+#include "SkillIdManager.h"
 
 gsl::span<uint8_t> data;
 pe::module* module;
 uintptr_t handle;
-
-const std::unique_ptr<PluginConfig> pluginConfig = std::make_unique<PluginConfig>();
 
 void WINAPI ScannerSetup() {
 #ifdef _DEBUG
@@ -32,8 +30,8 @@ void WINAPI ScannerSetup() {
 	data = s2->as_bytes();
 }
 
-void WINAPI InitConfigValues() {
-	pluginConfig->ReloadFromConfig();
+static void WINAPI InitConfigValues() {
+	g_PluginConfig.ReloadFromConfig();
 }
 
 /// <summary>
@@ -84,6 +82,18 @@ uintptr_t HookFunction(const char* pattern, int offset, FuncType& originalFuncti
 	return 0;
 }
 
+template<typename FuncType>
+uintptr_t HookFunction(const uintptr_t address, FuncType& originalFunction, FuncType hookFunction, const char* debugName)
+{
+#ifdef _DEBUG
+	printf("Address of %s is %p\n", debugName, (void*)address);
+	std::cout << std::endl;
+#endif // _DEBUG
+	originalFunction = module->rva_to<std::remove_pointer_t<FuncType>>(address - handle);
+	DetourAttach(&(PVOID&)originalFunction, hookFunction);
+	return address;
+}
+
 static __int64* HookDataManager(const char* pattern, int offset2) {
 	if (auto it = std::search(data.begin(), data.end(), pattern_searcher(pattern)); it != data.end()) {
 		const auto aAddress = reinterpret_cast<uintptr_t>(&it[0]);
@@ -126,30 +136,72 @@ static __int64* WINAPI InitDetours() {
 	DetourTransactionBegin();
 	DetourUpdateThread(NtCurrentThread());
 
-	if (auto result = std::search(data.begin(), data.end(), pattern_searcher(xorstr_("66 89 54 24 10 48 89 4C 24 08 57 48 81 EC 10 02 00 00 48 C7 84 24 B8 00 00 00 FE FF FF FF"))); result != data.end()) {
-		auto address = GetAddress(((uintptr_t)&result[0] + 0x38), 1, 5);
-#ifdef _DEBUG
-		printf("Address of %s is %p\n", "BNSClient_GetWorld", (void*)address);
-		std::cout << std::endl;
-#endif // _DEBUG
-		BNSClient_GetWorld = module->rva_to<std::remove_pointer_t<decltype(BNSClient_GetWorld)>>(address - handle);
-		DetourAttach(&(PVOID&)BNSClient_GetWorld, &hkBNSClient_GetWorld);
-	}
-
 	HookFunction(xorstr_("0F B6 47 18 48 8D 4C 24 30 89 03"), -0x38, oBInputKey, &hkBInputKey, "aBinput");
-	HookFunction(xorstr_("40 53 48 83 EC 20 48 C7 01 00 00 00 00 48 8B D9 48 85 D2 74"), 0, oDrElIter_DrElIter, "aDrElIter_DrElIter");
 	auto pattern = xorstr_("0F B6 C0 85 C0 75 07 32 C0 E9 67 07 00 00 E8 ?? ?? ?? ?? 48 ?? ?? ?? ?? 00 00 00 48 ?? ?? ?? ?? 00 00 00 48 8B 00 48 8B ?? ?? ?? ?? 00 00 48 8B ?? ?? ?? ?? 00 00 FF 90 B8 00 00 00 48 8B D0 48 ?? ?? ?? ??");
 	auto dataManagerPtr = HookDataManager(pattern, 0xF);
+	HookFunction(xorstr_("80 79 12 00 ?? ?? 48 8B 49 14 E9 ?? ?? ?? ?? 48 8B 41 24 48 83 C1 24 48 FF 60 18"), 0x00, oFind_b8, hkFind_b8, "Find_b8");
 
 	DetourTransactionCommit();
 	return dataManagerPtr;
 }
 
-EffectRemover effectRemover;
+static uintptr_t* BNSClientInstance = NULL;
+static _AddInstantNotification oAddInstantNotification;
+static _ExecuteConsoleCommandNoHistory oExecuteConsoleCommandNoHistory;
+BSMessaging* Messaging;
 
-static void InitSkillshowRemove() {
+/// <summary>
+/// Setup BnS messaging to send chat or notification messages in game.
+/// From Tonic
+/// </summary>
+/// <returns></returns>
+void WINAPI InitMessaging() {
+#ifdef _DEBUG
+	std::cout << "InitMessaging" << std::endl;
+#endif // _DEBUG
+
+#ifdef _DEBUG
+	std::cout << "Searching sBShowHud" << std::endl;
+#endif // _DEBUG
+
+	auto sBShowHud = std::search(data.begin(), data.end(), pattern_searcher(xorstr_("0F 29 70 C8 ?? 8B F2 48 8B ?? 48 83 79 08 00")));
+	if (sBShowHud != data.end()) {
+		BNSClientInstance = (uintptr_t*)GetAddress((uintptr_t)&sBShowHud[0] + 0x15, 3, 7);
+	}
+
+#ifdef _DEBUG
+	std::cout << "Searching AddInstantNotification" << std::endl;
+#endif // _DEBUG
+	// Used for sending notifications about certain actions
+	bool diffPattern = false;
+	auto sAddNotif = std::search(data.begin(), data.end(), pattern_searcher(xorstr_("45 33 DB 41 8D 42 ?? 3C 02 BB 05 00 00 00 41 0F 47 DB")));
+	if (sAddNotif == data.end()) {
+		// Old compiler stuff (NAEU CLIENT)
+		diffPattern = true;
+		sAddNotif = std::search(data.begin(), data.end(), pattern_searcher(xorstr_("33 FF 80 BC 24 80 00 00 00 01 75 05")));
+	}
+
+	if (sAddNotif != data.end()) {
+		oAddInstantNotification = module->rva_to<std::remove_pointer_t<decltype(oAddInstantNotification)>>((uintptr_t)&sAddNotif[0] - (diffPattern ? 0x13 : 0x68) - handle);
+	}
+
+#ifdef _DEBUG
+	std::cout << "Searching Done" << std::endl;
+#endif // _DEBUG
+	Messaging = new BSMessaging(BNSClientInstance, oAddInstantNotification);
+#ifdef _DEBUG
+	std::cout << "Messaging object created" << std::endl;
+#endif // _DEBUG
+
+#ifdef _DEBUG
+	printf("Address of BNSInstance is %p\n", (void*)BNSClientInstance);
+	std::cout << std::endl;
+#endif // _DEBUG
+}
+
+static void InitSkillIdManager() {
 	while (true) {
-		if (effectRemover.RemoveEffects()) {
+		if (g_SkillIdManager.Setup()) {
 			break;
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -160,10 +212,11 @@ static void WINAPI LeanPlugin_Init()
 {
 	InitConfigValues();
 	ScannerSetup();
+	InitMessaging();
 	const auto dataManagerPtr = InitDetours();
-	effectRemover = EffectRemover(dataManagerPtr);
+	g_SkillIdManager.SetDataManagerPtr(dataManagerPtr);
 	if (dataManagerPtr != nullptr) {
-		std::jthread skillShowThread(InitSkillshowRemove);
+		std::jthread skillShowThread(InitSkillIdManager);
 		skillShowThread.detach();
 	}
 }

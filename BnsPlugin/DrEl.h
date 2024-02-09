@@ -6,6 +6,11 @@ public:
 	__int16 subtype;
 	unsigned __int16 size;
 };
-struct _DrEl {
-	DrEl* _el;
+
+#pragma pack(push, 1)
+struct __declspec(align(4)) DrRecordPtr
+{
+	DrEl* _record;
+	int _cacheChunkIndex;
 };
+#pragma pack(pop)

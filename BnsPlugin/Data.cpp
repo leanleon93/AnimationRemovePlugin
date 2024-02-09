@@ -29,14 +29,22 @@ DrDataTable* DataHelper::GetTable(Data::DataManager* dataManager, const wchar_t*
 			return dataManager->_loaderDefs[i].table;
 		}
 	}
+	return nullptr;
 }
 
-DrElIter* DataHelper::DrElIter_DrElIter()
-{
-	auto* buff = static_cast<DrElIter*>(calloc(1, 16));
-	return buff;
-}
-
-void DataHelper::FreeDrElIter(DrElIter* ptr) {
-	free(ptr);
+__int16 DataHelper::GetTableId(Data::DataManager* dataManager, const wchar_t* tableName) {
+	if (dataManager == nullptr) {
+		return 0;
+	}
+	int arraySize = sizeof(dataManager->_loaderDefs) / sizeof(dataManager->_loaderDefs[0]);
+	for (int i = 0; i < arraySize; i++) {
+		auto loaderDef = dataManager->_loaderDefs[i];
+		auto tableDef = loaderDef.tableDef;
+		if (tableDef == nullptr) continue;
+		auto name = tableDef->name;
+		if (wcscmp(name, tableName) == 0) {
+			return tableDef->type;
+		}
+	}
+	return 0;
 }

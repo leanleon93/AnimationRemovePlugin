@@ -1,14 +1,6 @@
 #pragma once
 #include "../DrEl.h"
 
-#pragma pack(push, 1)
-struct __declspec(align(4)) DrRecordPtr
-{
-	_DrEl* _record;
-	int _cacheChunkIndex;
-};
-#pragma pack(pop)
-
 namespace Data {
 #pragma pack(push, 1)
 	const struct __declspec(align(4)) Skillshow3Record : DrEl {
