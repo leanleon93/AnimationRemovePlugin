@@ -12,6 +12,7 @@ struct AnimFilterConfig {
 	};
 	struct AnimFilterProfile {
 		std::string Name;
+		std::wstring Text;
 		struct EffectOption {
 			unsigned __int64 Key;
 			std::string Alias;
@@ -19,9 +20,9 @@ struct AnimFilterConfig {
 		};
 		struct SkillOption {
 			std::wstring Name;
-			bool HideSpec1;
-			bool HideSpec2;
-			bool HideSpec3;
+			bool HideSpec1 = false;
+			bool HideSpec2 = false;
+			bool HideSpec3 = false;
 			bool IsHideAll() const {
 				return HideSpec1 && HideSpec2 && HideSpec3;
 			}
@@ -31,7 +32,7 @@ struct AnimFilterConfig {
 		};
 		std::vector<EffectOption> EffectFilters;
 		std::vector<SkillOption> SkillFilters;
-		SkillOption GetJobSkillOption(const std::wstring& jobName) const {
+		SkillOption GetJobSkillOption(std::wstring_view jobName) const {
 			for (const auto& skillOption : SkillFilters) {
 				if (skillOption.Name == jobName) {
 					return skillOption;

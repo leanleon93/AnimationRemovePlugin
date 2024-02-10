@@ -127,10 +127,11 @@ namespace Data {
 		wchar_t* skill_skin_desc;
 	};
 #pragma pack(pop)
-
+#pragma pack(push, 1)
 	struct __declspec(align(4)) Skillshow3RecordPtr : DrRecordPtr
 	{
 		__unaligned __declspec(align(1)) const Skillshow3Record* _debug;
 		bool _makeCopy;
 	};
+#pragma pack(pop)
 }

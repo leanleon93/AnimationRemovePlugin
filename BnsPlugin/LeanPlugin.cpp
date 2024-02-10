@@ -3,14 +3,10 @@
 #include <pe/module.h>
 #include "detours.h"
 #include "LeanPlugin.h"
-#include <iostream>
 #include "searchers.h"
 #include "Hooks.h"
 #include "xorstr.hpp"
 #include "PluginConfig.h"
-#include "Data.h"
-#include "Records/Skillshow3/SkillShow3Base.h"
-#include <functional>
 #include "SkillIdManager.h"
 
 gsl::span<uint8_t> data;
@@ -24,7 +20,7 @@ void WINAPI ScannerSetup() {
 	module = pe::get_module();
 	handle = module->handle();
 	const auto sections2 = module->segments();
-	const auto& s2 = std::find_if(sections2.begin(), sections2.end(), [](const IMAGE_SECTION_HEADER& x) {
+	const auto& s2 = std::ranges::find_if(sections2.begin(), sections2.end(), [](const IMAGE_SECTION_HEADER& x) {
 		return x.Characteristics & IMAGE_SCN_CNT_CODE;
 		});
 	data = s2->as_bytes();
@@ -145,7 +141,7 @@ static __int64* WINAPI InitDetours() {
 	return dataManagerPtr;
 }
 
-static uintptr_t* BNSClientInstance = NULL;
+static uintptr_t* BNSClientInstance = nullptr;
 static _AddInstantNotification oAddInstantNotification;
 static _ExecuteConsoleCommandNoHistory oExecuteConsoleCommandNoHistory;
 BSMessaging* Messaging;
@@ -164,8 +160,7 @@ void WINAPI InitMessaging() {
 	std::cout << "Searching sBShowHud" << std::endl;
 #endif // _DEBUG
 
-	auto sBShowHud = std::search(data.begin(), data.end(), pattern_searcher(xorstr_("0F 29 70 C8 ?? 8B F2 48 8B ?? 48 83 79 08 00")));
-	if (sBShowHud != data.end()) {
+	if (auto sBShowHud = std::search(data.begin(), data.end(), pattern_searcher(xorstr_("0F 29 70 C8 ?? 8B F2 48 8B ?? 48 83 79 08 00"))); sBShowHud != data.end()) {
 		BNSClientInstance = (uintptr_t*)GetAddress((uintptr_t)&sBShowHud[0] + 0x15, 3, 7);
 	}
 

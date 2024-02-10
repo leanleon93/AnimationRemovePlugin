@@ -1,14 +1,13 @@
 #pragma once
-#include <cstdint>
 #include "AnimFilterConfig.h"
 #include <filesystem>
 
 class PluginConfig {
 public:
-	AnimFilterConfig::AnimFilterProfile GetActiveProfile() const;
-	AnimFilterConfig GetAnimFilterConfig() const;
-	bool AnimFilterEnabled() const;
 	PluginConfig();
+	const AnimFilterConfig::AnimFilterProfile& GetActiveProfile() const;
+	const AnimFilterConfig& GetAnimFilterConfig() const;
+	bool AnimFilterEnabled() const;
 	void ReloadFromConfig();
 	void SetActiveFilter(int profileId);
 	bool IsLoaded() const;

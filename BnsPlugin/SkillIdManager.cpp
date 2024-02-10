@@ -6,9 +6,14 @@
 #include "Records/Skill3/Skill3RecordBase.h"
 #include "Records/Skill3/Skill3ActiveSkillRecord.h"
 #include "Records/Itemskill/ItemskillRecordBase.h"
-#include <locale> // For std::tolower
+#include "Records/Effect/EffectRecordBase.h"
+#include "PluginConfig.h"
 
 SkillIdManager g_SkillIdManager;
+
+__int16 SkillIdManager::GetSkillshowTableId() const {
+	return skillshowTableId;
+}
 
 char SkillIdManager::GetKrJobForEnName(std::wstring const& enName) {
 	if (auto it = jobNameMap.find(enName); it != jobNameMap.end()) {
@@ -46,6 +51,7 @@ std::unordered_set<int> SkillIdManager::GetInheritedIds(int id) {
 		auto nestedIds = GetInheritedIds(record->key.skill_id);
 		inheritedIds.insert(nestedIds.begin(), nestedIds.end());
 	} while (innerIter->_vtptr->Next(innerIter));
+	table->__vftable->removeInnerIter(table, innerIter);
 	return inheritedIds;
 }
 
@@ -57,7 +63,7 @@ std::unordered_set<int> SkillIdManager::GetChildSkillIds(int id) {
 	std::unordered_set<int> childIds;
 	do {
 		if (!innerIter->_vtptr->IsValid(innerIter)) continue;
-		auto record = (DrEl*)innerIter->_vtptr->Ptr(innerIter);
+		auto record = innerIter->_vtptr->Ptr(innerIter);
 		if (record == nullptr) continue;
 		if (record->subtype != (__int16)Data::Skill3RecordSubType::SKILL3_RECORD_SUB_ACTIVE_SKILL) continue;
 		auto activeSkillRecord = (Data::Skill3ActiveSkillRecord*)record;
@@ -73,10 +79,11 @@ std::unordered_set<int> SkillIdManager::GetChildSkillIds(int id) {
 			childIds.insert(nestedIds.begin(), nestedIds.end());
 		}
 	} while (innerIter->_vtptr->Next(innerIter));
+	table->__vftable->removeInnerIter(table, innerIter);
 	return childIds;
 }
 
-void SkillIdManager::AddIds(Data::SkillTraitRecord* record, int* ids, int size, SkillIdsForJob& skillIdsForJobEntry) {
+void SkillIdManager::AddIds(Data::SkillTraitRecord const* record, int const* ids, int size, SkillIdsForJob& skillIdsForJobEntry) {
 	auto jobStyleIndex = Data::SkillTraitJobStyleHelper::GetSpecIndexForJobStyleType(record->key.job_style);
 	if (jobStyleIndex <= 0) return;
 	if (!skillIdsForJobEntry.SkillIdsForSpec.contains(jobStyleIndex)) {
@@ -92,12 +99,12 @@ void SkillIdManager::AddIds(Data::SkillTraitRecord* record, int* ids, int size, 
 	}
 }
 
-void  SkillIdManager::AddFixedIds(Data::SkillTraitRecord* record, SkillIdsForJob& skillIdsForJobEntry) {
+void  SkillIdManager::AddFixedIds(Data::SkillTraitRecord const* record, SkillIdsForJob& skillIdsForJobEntry) {
 	int size = sizeof(record->fixed_skill3_id) / sizeof(record->fixed_skill3_id[0]);
 	AddIds(record, record->fixed_skill3_id, size, skillIdsForJobEntry);
 }
 
-void  SkillIdManager::AddVariableIds(Data::SkillTraitRecord* record, SkillIdsForJob& skillIdsForJobEntry) {
+void  SkillIdManager::AddVariableIds(Data::SkillTraitRecord const* record, SkillIdsForJob& skillIdsForJobEntry) {
 	int size = sizeof(record->variable_skill3_id) / sizeof(record->variable_skill3_id[0]);
 	AddIds(record, record->variable_skill3_id, size, skillIdsForJobEntry);
 }
@@ -116,8 +123,8 @@ static bool containsSubstring(const wchar_t* str, const wchar_t* substr) {
 	std::wstring sub(substr);
 
 	// Convert both strings to lowercase
-	std::transform(s.begin(), s.end(), s.begin(), ::towlower);
-	std::transform(sub.begin(), sub.end(), sub.begin(), ::towlower);
+	std::ranges::transform(s.begin(), s.end(), s.begin(), ::towlower);
+	std::ranges::transform(sub.begin(), sub.end(), sub.begin(), ::towlower);
 
 	return s.find(sub) != std::wstring::npos;
 }
@@ -139,6 +146,7 @@ bool SkillIdManager::IsBraceletId(int id) {
 			return false;
 		}
 	} while (innerIter->_vtptr->Next(innerIter));
+	table->__vftable->removeInnerIter(table, innerIter);
 	return false;
 }
 
@@ -173,6 +181,7 @@ std::unordered_set<int> SkillIdManager::GetItemSkills(int id) {
 		if (*itemSimSkillId == 0) continue;
 		itemSkills.insert(*itemSimSkillId);
 	} while (innerIter->_vtptr->Next(innerIter));
+	table->__vftable->removeInnerIter(table, innerIter);
 	return itemSkills;
 }
 
@@ -207,6 +216,7 @@ bool SkillIdManager::SetupSkillIdsForJob(const std::wstring& enName, char krName
 	AddItemSkills(skillIdsForJobEntry);
 	FilterBracelet(skillIdsForJobEntry);
 	skillIdsForJobMap[enName] = skillIdsForJobEntry;
+	table->__vftable->removeInnerIter(table, innerIter);
 	return true;
 }
 
@@ -240,6 +250,7 @@ bool SkillIdManager::SetupJobNameMap() {
 		auto enJobName = (Data::TextRecord*)textTable->__vftable->Find_b8(textTable, record->name2);
 		jobNameMap[enJobName->text.data] = record->key.job;
 	} while (innerIter->_vtptr->Next(innerIter));
+	table->__vftable->removeInnerIter(table, innerIter);
 	return true;
 }
 
@@ -252,6 +263,7 @@ bool SkillIdManager::Setup() {
 	if (success1 && success2 && success3) {
 		SetupComplete = true;
 		ResetIdsToFilter();
+		ReapplyEffectFilters();
 	}
 	return success1 && success2 && success3;
 }
@@ -267,7 +279,7 @@ void SkillIdManager::ResetIdsToFilter() {
 	idsToFilter.clear();
 	if (!g_PluginConfig.IsLoaded() || !g_PluginConfig.HasActiveProfile())
 		return;
-	auto activeProfile = g_PluginConfig.GetActiveProfile();
+	auto& activeProfile = g_PluginConfig.GetActiveProfile();
 
 	//iterate over all jobnames
 	for (auto const& [enName, krName] : jobNameMap) {
@@ -314,6 +326,10 @@ Data::Skillshow3Record::Key SkillIdManager::SkillShow3KeyHelper::ExtractKey(__in
 	return parts;
 }
 
+__int32 SkillIdManager::SkillShow3KeyHelper::ExtractId(__int64 key) {
+	return static_cast<__int32>(key);
+}
+
 void SkillIdManager::SetDataManagerPtr(__int64 const* ptr) {
 	this->dataManagerPtr = ptr;
 }
@@ -322,6 +338,95 @@ bool SkillIdManager::IsSetupComplete() const {
 	return SetupComplete;
 }
 
-std::unordered_set<int> SkillIdManager::GetIdsToFilter() const {
+const std::unordered_set<int>& SkillIdManager::GetIdsToFilter() const {
 	return idsToFilter;
+}
+
+void SkillIdManager::RestoreEffects() {
+	if (this->dataManagerPtr == nullptr || *this->dataManagerPtr == NULL) {
+		return;
+	}
+	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
+	const auto table = DataHelper::GetTable(manager, L"effect");
+	if (table == nullptr) return;
+	for (auto& [key, kvp] : effectRestoreList) {
+		auto record = table->__vftable->Find_b8(table, key);
+		if (record == nullptr) continue;
+		auto effectRecord = (Data::EffectRecord*)record;
+		std::string attribute = "normal_component";
+		if (kvp.contains(attribute)) effectRecord->normal_component[0] = kvp[attribute];
+		attribute = "critical_component";
+		if (kvp.contains(attribute)) effectRecord->critical_component[0] = kvp[attribute];
+		attribute = "back_normal_component";
+		if (kvp.contains(attribute)) effectRecord->back_normal_component[0] = kvp[attribute];
+		attribute = "back_critical_component";
+		if (kvp.contains(attribute)) effectRecord->back_critical_component[0] = kvp[attribute];
+		attribute = "buff_continuance_component";
+		if (kvp.contains(attribute)) effectRecord->buff_continuance_component[0] = kvp[attribute];
+		attribute = "immune_buff_component";
+		if (kvp.contains(attribute)) effectRecord->immune_buff_component[0] = kvp[attribute];
+		attribute = "detach_show";
+		if (kvp.contains(attribute)) effectRecord->detach_show[0] = kvp[attribute];
+	}
+	for (auto& [key, kvp] : effectRestoreList) {
+		kvp.clear();
+	}
+	effectRestoreList.clear();
+}
+
+void SkillIdManager::RemoveEffects() {
+	if (this->dataManagerPtr == nullptr || *this->dataManagerPtr == NULL) {
+		return;
+	}
+	if (!g_PluginConfig.IsLoaded() || !g_PluginConfig.HasActiveProfile()) return;
+	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
+	const auto table = DataHelper::GetTable(manager, L"effect");
+	if (table == nullptr) return;
+	auto& effectFilters = g_PluginConfig.GetActiveProfile().EffectFilters;
+	for (auto const& filter : effectFilters) {
+		if (filter.IsAlias) continue; //TODO: add alias support
+		auto record = table->__vftable->Find_b8(table, filter.Key);
+		if (record == nullptr) continue;
+		auto effectRecord = (Data::EffectRecord*)record;
+		std::string attribute = "normal_component";
+		if (effectRecord->normal_component != nullptr && effectRecord->normal_component[0] != L'\0') {
+			effectRestoreList[filter.Key][attribute] = effectRecord->normal_component[0];
+			*effectRecord->normal_component = L'\0';
+		}
+		if (effectRecord->critical_component != nullptr && effectRecord->critical_component[0] != L'\0') {
+			attribute = "critical_component";
+			effectRestoreList[filter.Key][attribute] = effectRecord->critical_component[0];
+			*effectRecord->critical_component = L'\0';
+		}
+		if (effectRecord->back_normal_component != nullptr && effectRecord->back_normal_component[0] != L'\0') {
+			attribute = "back_normal_component";
+			effectRestoreList[filter.Key][attribute] = effectRecord->back_normal_component[0];
+			*effectRecord->back_normal_component = L'\0';
+		}
+		if (effectRecord->back_critical_component != nullptr && effectRecord->back_critical_component[0] != L'\0') {
+			attribute = "back_critical_component";
+			effectRestoreList[filter.Key][attribute] = effectRecord->back_critical_component[0];
+			*effectRecord->back_critical_component = L'\0';
+		}
+		if (effectRecord->buff_continuance_component != nullptr && effectRecord->buff_continuance_component[0] != L'\0') {
+			attribute = "buff_continuance_component";
+			effectRestoreList[filter.Key][attribute] = effectRecord->buff_continuance_component[0];
+			*effectRecord->buff_continuance_component = L'\0';
+		}
+		if (effectRecord->immune_buff_component != nullptr && effectRecord->immune_buff_component[0] != L'\0') {
+			attribute = "immune_buff_component";
+			effectRestoreList[filter.Key][attribute] = effectRecord->immune_buff_component[0];
+			*effectRecord->immune_buff_component = L'\0';
+		}
+		if (effectRecord->detach_show != nullptr && effectRecord->detach_show[0] != L'\0') {
+			attribute = "detach_show";
+			effectRestoreList[filter.Key][attribute] = effectRecord->detach_show[0];
+			*effectRecord->detach_show = L'\0';
+		}
+	}
+}
+
+void SkillIdManager::ReapplyEffectFilters() {
+	RestoreEffects();
+	RemoveEffects();
 }

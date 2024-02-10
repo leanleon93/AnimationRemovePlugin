@@ -1,14 +1,19 @@
+#include "BSFunctions.h"
+#include "Data.h"
+#include "DrEl.h"
 #include "Hooks.h";
 #include "PluginConfig.h"
-#include <iostream>
-#include <unordered_map>
-#include "Data.h"
+#include "Records/Skillshow3/SkillShow3Base.h"
 #include "SkillIdManager.h"
+#include <cstdint>
+#include <format>
+#include <string>
+#include <unordered_map>
 
 DrDataTable* (__fastcall* oData_DataManager_Effect)();
 
 template <typename Callable>
-void handleKeyEvent(EInputKeyEvent* InputKeyEvent, int vKeyTarget, const Callable& onPress) {
+void handleKeyEvent(EInputKeyEvent const* InputKeyEvent, int vKeyTarget, const Callable& onPress) {
 	static std::unordered_map<int, bool> toggleKeys;
 	if (vKeyTarget == 0)  return;
 	if (InputKeyEvent->_vKey == vKeyTarget) {
@@ -25,7 +30,7 @@ void handleKeyEvent(EInputKeyEvent* InputKeyEvent, int vKeyTarget, const Callabl
 
 template <typename Callable>
 void handleKeyEventWithModifiers(
-	EInputKeyEvent* InputKeyEvent,
+	EInputKeyEvent const* InputKeyEvent,
 	int vKeyTarget,
 	bool alt,
 	bool shift,
@@ -75,23 +80,32 @@ extern BSMessaging* Messaging;
 static void ReloadConfigOnHotkeyPress() {
 	g_PluginConfig.ReloadFromConfig();
 	g_SkillIdManager.ResetIdsToFilter();
+	g_SkillIdManager.ReapplyEffectFilters();
 	ReloadSkillShow3OnHotkeyPress();
-	auto message = LR"(AnimFilter config reloaded)";
+	auto message = LR"(AnimFilter Config Reloaded)";
 	Messaging->DisplaySystemChatMessage(message, false);
+	if (g_PluginConfig.AnimFilterEnabled() && g_PluginConfig.GetActiveProfile().Text != L"") {
+		Messaging->DisplaySystemChatMessage(g_PluginConfig.GetActiveProfile().Text.c_str(), false);
+	}
 }
 
 static void SetProfileOnHotkeyPress(int profileId) {
 	g_PluginConfig.SetActiveFilter(profileId);
 	g_SkillIdManager.ResetIdsToFilter();
+	g_SkillIdManager.ReapplyEffectFilters();
 	ReloadSkillShow3OnHotkeyPress();
-	std::wstring message = std::format(LR"(AnimFilter using Profile {})", profileId);
+	if (!g_PluginConfig.AnimFilterEnabled()) return;
+	std::wstring message = std::format(LR"(AnimFilter Using Profile {})", profileId);
 	Messaging->DisplaySystemChatMessage(message.c_str(), false);
+	if (g_PluginConfig.GetActiveProfile().Text != L"") {
+		Messaging->DisplaySystemChatMessage(g_PluginConfig.GetActiveProfile().Text.c_str(), false);
+	}
 }
 
 bool(__fastcall* oBInputKey)(BInputKey* thisptr, EInputKeyEvent* InputKeyEvent);
 bool __fastcall hkBInputKey(BInputKey* thisptr, EInputKeyEvent* InputKeyEvent) {
 	if (!g_PluginConfig.IsLoaded()) return oBInputKey(thisptr, InputKeyEvent);
-	auto animFilterConfig = g_PluginConfig.GetAnimFilterConfig();
+	auto& animFilterConfig = g_PluginConfig.GetAnimFilterConfig();
 	handleKeyEventWithModifiers(InputKeyEvent, animFilterConfig.ReloadKey.KeyCode, animFilterConfig.ReloadKey.Alt, animFilterConfig.ReloadKey.Shift, animFilterConfig.ReloadKey.Ctrl, ReloadConfigOnHotkeyPress);
 	handleKeyEventWithModifiers(InputKeyEvent, animFilterConfig.Profile1.KeyCode, animFilterConfig.Profile1.Alt, animFilterConfig.Profile1.Shift, animFilterConfig.Profile1.Ctrl, []() {
 		SetProfileOnHotkeyPress(1);
@@ -114,8 +128,6 @@ bool __fastcall hkBInputKey(BInputKey* thisptr, EInputKeyEvent* InputKeyEvent) {
 void RemoveAnimationsForRecord(Data::Skillshow3Record* record)
 {
 	auto setToNull = [](wchar_t* member) {
-		if (member == nullptr) return;
-		if (member[0] == L'\0') return;
 		*member = L'\0';
 		};
 
@@ -157,12 +169,12 @@ void RemoveAnimationsForRecord(Data::Skillshow3Record* record)
 
 DrEl* (__fastcall* oFind_b8)(DrMultiKeyTable* thisptr, unsigned __int64 key);
 DrEl* __fastcall hkFind_b8(DrMultiKeyTable* thisptr, unsigned __int64 key) {
-	if (!g_PluginConfig.IsLoaded() || !g_PluginConfig.AnimFilterEnabled() || !g_PluginConfig.HasActiveProfile()) {
+	if (!g_PluginConfig.AnimFilterEnabled() || !g_PluginConfig.IsLoaded() || !g_PluginConfig.HasActiveProfile()) {
 		return oFind_b8(thisptr, key);
 	}
-	if (thisptr->_tabledef->type != g_SkillIdManager.skillshowTableId) return oFind_b8(thisptr, key);
-	const auto ids = g_SkillIdManager.GetIdsToFilter();
-	if (const auto id = SkillIdManager::SkillShow3KeyHelper::ExtractKey(key).id; !ids.contains(id)) return oFind_b8(thisptr, key);
+	if (thisptr->_tabledef->type != g_SkillIdManager.GetSkillshowTableId()) return oFind_b8(thisptr, key);
+	const auto& ids = g_SkillIdManager.GetIdsToFilter();
+	if (const auto skillId = static_cast<int32_t>(key); !ids.contains(skillId)) return oFind_b8(thisptr, key);
 	auto recordBase = oFind_b8(thisptr, key);
 	if (recordBase == nullptr) return oFind_b8(thisptr, key);
 	auto record = (Data::Skillshow3Record*)recordBase;

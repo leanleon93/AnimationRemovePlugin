@@ -1,8 +1,4 @@
 #include "PluginConfig.h"
-#include "SimpleIni.h"
-#include "xorstr.hpp"
-#include <filesystem>
-#include <iostream>
 #include "pugixml/pugixml.hpp"
 
 PluginConfig g_PluginConfig;
@@ -25,7 +21,7 @@ std::string PluginConfig::GetDocumentsDirectory() {
 	return "";
 }
 
-static void SetHotkey(pugi::xml_node* node, AnimFilterConfig::AnimFilterHotkey* hotkey) {
+static void SetHotkey(pugi::xml_node const* node, AnimFilterConfig::AnimFilterHotkey* hotkey) {
 	auto hotkeyStr = node->attribute("keyCode").as_string();
 	int keyCode = std::stoi(hotkeyStr, nullptr, 16);
 	hotkey->KeyCode = keyCode;
@@ -34,7 +30,7 @@ static void SetHotkey(pugi::xml_node* node, AnimFilterConfig::AnimFilterHotkey* 
 	hotkey->Alt = node->attribute("bAlt").as_bool();
 }
 
-static void SetProfileHotkeys(pugi::xml_document& doc, AnimFilterConfig* animFilterConfig)
+static void SetProfileHotkeys(pugi::xml_document const& doc, AnimFilterConfig* animFilterConfig)
 {
 	for (pugi::xml_node globalOptionsNode : doc.child("config").child("options").children("option")) {
 		auto name = globalOptionsNode.attribute("name").as_string();
@@ -69,13 +65,18 @@ static std::wstring PugiCharPtrToWString(const pugi::char_t* charPtr) {
 	return std::wstring(utf8Str, utf8Str + strlen(utf8Str));
 }
 
-static void SetProfiles(pugi::xml_document& doc, AnimFilterConfig* animFilterConfig) {
+static void SetProfiles(pugi::xml_document const& doc, AnimFilterConfig* animFilterConfig) {
 	for (pugi::xml_node profileNode : doc.child("config").child("profiles").children("profile")) {
 		auto profileId = profileNode.attribute("name").as_int();
 		AnimFilterConfig::AnimFilterProfile profile;
 		profile.Name = profileNode.attribute("name").as_string();
+		if (pugi::xml_node textNode = profileNode.child("text"); textNode) {
+			auto text = textNode.text();
+			profile.Text = PugiCharPtrToWString(text.as_string());
+		}
 		for (pugi::xml_node effectOptionNode : profileNode.child("effect_options").children("option")) {
 			AnimFilterConfig::AnimFilterProfile::EffectOption effectOption;
+
 			auto isAlias = effectOptionNode.attribute("isAlias").as_bool();
 			effectOption.IsAlias = isAlias;
 			if (isAlias) {
@@ -130,12 +131,12 @@ void PluginConfig::SetActiveFilter(int profileId)
 	}
 }
 
-AnimFilterConfig::AnimFilterProfile PluginConfig::GetActiveProfile() const
+const AnimFilterConfig::AnimFilterProfile& PluginConfig::GetActiveProfile() const
 {
 	return this->AnimFilterConfig.ActiveProfile;
 }
 
-AnimFilterConfig PluginConfig::GetAnimFilterConfig() const
+const AnimFilterConfig& PluginConfig::GetAnimFilterConfig() const
 {
 	return this->AnimFilterConfig;
 }

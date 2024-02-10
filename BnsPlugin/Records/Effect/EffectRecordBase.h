@@ -2,6 +2,7 @@
 #include "../DrEl.h"
 
 namespace Data {
+#pragma pack(push, 4)
 	const struct EffectRecord : DrEl
 	{
 	public:
@@ -15,7 +16,17 @@ namespace Data {
 		unsigned __int64 name2;
 		unsigned __int64 name3;
 		__int16 level;
+		__int16 pad;
+		char padding[0x1B6];
+		__declspec(align(4)) wchar_t* normal_component;
+		wchar_t* critical_component;
+		wchar_t* back_normal_component;
+		wchar_t* back_critical_component;
+		wchar_t* buff_continuance_component;
+		wchar_t* immune_buff_component;
+		wchar_t* detach_show;
 	};
+#pragma pack(pop)
 #pragma pack(push, 1)
 	struct __declspec(align(4)) EffectRecordPtr // : DrRecordPtr
 	{
