@@ -3,29 +3,6 @@
 #include <cstddef>
 #include <string>
 
-//struct DrTable {
-//	void* __vftable;
-//};
-//
-//struct DrDataTable : DrTable {
-//};
-//
-//struct DrVTable {
-//	using PtrFunction = void* (*)(void*);
-//	using NextFunction = bool (*)(void*);
-//	PtrFunction Ptr;
-//	NextFunction Next;
-//};
-//
-//struct DrElNode {
-//	DrVTable* _vtptr;
-//};
-//
-//struct DrElIter {
-//	DrElNode* _node;
-//	DrDataTable* _table;
-//};
-
 class BInputKey {
 public:
 	int Key;
