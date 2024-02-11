@@ -9,6 +9,7 @@ namespace Data {
 		SKILL3_RECORD_SUB_ACTION = 0x2,
 		SKILL3_RECORD_SUB_COUNT = 0x3,
 	};
+#pragma pack(push, 1)
 	struct Skill3Record : DrEl {
 		union Key {
 			struct {
@@ -17,8 +18,14 @@ namespace Data {
 			};
 			unsigned __int64 key;
 		};
-		Key key;
-		wchar_t* alias;
-		char padding[0x26C];
+		__declspec(align(8)) Key key;
+		__declspec(align(8)) wchar_t* alias;
+		__int16 revised_event_probability_in_exec[5];
+		__unaligned __declspec(align(4)) unsigned __int64 skill_modify_limit;
+		bool is_ego_skill;
+		bool use_ego_skill_training_sequence;
+		__unaligned __declspec(align(4)) unsigned __int64 systematization[16];
+		char padding2[0x1D6];
 	};
+#pragma pack(pop)
 }

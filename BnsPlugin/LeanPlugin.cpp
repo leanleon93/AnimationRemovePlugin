@@ -8,6 +8,9 @@
 #include "xorstr.hpp"
 #include "PluginConfig.h"
 #include "SkillIdManager.h"
+#ifdef _DEBUG
+#include <iostream>
+#endif // _DEBUG
 
 gsl::span<uint8_t> data;
 pe::module* module;

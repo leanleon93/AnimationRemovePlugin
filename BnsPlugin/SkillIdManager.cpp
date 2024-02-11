@@ -6,7 +6,6 @@
 #include "Records/Skill3/Skill3RecordBase.h"
 #include "Records/Skill3/Skill3ActiveSkillRecord.h"
 #include "Records/Itemskill/ItemskillRecordBase.h"
-#include "Records/Effect/EffectRecordBase.h"
 #include "PluginConfig.h"
 
 SkillIdManager g_SkillIdManager;
@@ -177,9 +176,9 @@ std::unordered_set<int> SkillIdManager::GetItemSkills(int id) {
 		auto record = (Data::ItemSkillRecord*)innerIter->_vtptr->Ptr(innerIter);
 		if (record == nullptr) continue;
 		if (record->skill_id != id) continue;
-		auto itemSimSkillId = reinterpret_cast<int*>(&record->item_sim_skill);
-		if (*itemSimSkillId == 0) continue;
-		itemSkills.insert(*itemSimSkillId);
+		auto itemSimSkillId = static_cast<__int32>(record->item_sim_skill);
+		if (itemSimSkillId == 0) continue;
+		itemSkills.insert(itemSimSkillId);
 	} while (innerIter->_vtptr->Next(innerIter));
 	table->__vftable->removeInnerIter(table, innerIter);
 	return itemSkills;
@@ -220,6 +219,122 @@ bool SkillIdManager::SetupSkillIdsForJob(const std::wstring& enName, char krName
 	return true;
 }
 
+bool SkillIdManager::SetupEffectIdsForJob(const std::wstring& enName, [[maybe_unused]] char krName) {
+	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
+	const auto table = DataHelper::GetTable(manager, L"skill3");
+	if (table == nullptr) return false;
+	auto effectIdsForJobEntry = EffectIdsForJob();
+	effectIdsForJobEntry.EnJobName = enName;
+
+	auto skillIdsForJobEntry = skillIdsForJobMap.find(enName);
+	if (skillIdsForJobEntry == skillIdsForJobMap.end()) return false;
+	auto const& skillIdsForJob = skillIdsForJobEntry->second;
+
+	auto const& fixedTargetEffectIdsForJob = fixedTargetEffectIds.find(enName);
+
+	for (auto const& skillIdsForSpec = skillIdsForJob.SkillIdsForSpec; auto const& [specIndex, skillIds] : skillIdsForSpec) {
+		if (fixedTargetEffectIdsForJob != fixedTargetEffectIds.end()) {
+			auto const& fixedEffectIdsForSpec = fixedTargetEffectIdsForJob->second.EffectIdsForSpec.find(specIndex);
+			if (fixedEffectIdsForSpec != fixedTargetEffectIdsForJob->second.EffectIdsForSpec.end()) {
+				effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(fixedEffectIdsForSpec->second.begin(), fixedEffectIdsForSpec->second.end());
+			}
+		}
+		for (auto id : skillIds) {
+			auto innerIter = table->__vftable->createInnerIter_d0(table);
+			do {
+				if (!innerIter->_vtptr->IsValid(innerIter)) continue;
+				auto record = (Data::Skill3Record*)innerIter->_vtptr->Ptr(innerIter);
+				if (record == nullptr) continue;
+				if (record->key.id != id) continue;
+				if (record->subtype != (__int16)Data::Skill3RecordSubType::SKILL3_RECORD_SUB_ACTIVE_SKILL) continue;
+				bool breakOuter = false;
+				for (auto const& systematization : record->systematization) {
+					if (systematization == 0) continue;
+					if (systematization == 30) {
+						breakOuter = true;
+						break;
+					}
+				}
+				if (breakOuter) continue;
+				auto activeSkillRecord = (Data::Skill3ActiveSkillRecord*)record;
+				for (auto passiveEffect : activeSkillRecord->passive_effect) {
+					if (passiveEffect == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(passiveEffect);
+				}
+				for (auto castEffect : activeSkillRecord->cast_effect) {
+					if (castEffect == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(castEffect);
+				}
+
+				for (auto swing_caster_effect : activeSkillRecord->swing_caster_effect_1) {
+					if (swing_caster_effect == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(swing_caster_effect);
+				}
+				for (auto swing_caster_effect : activeSkillRecord->swing_caster_effect_2) {
+					if (swing_caster_effect == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(swing_caster_effect);
+				}
+				for (auto swing_caster_effect : activeSkillRecord->swing_caster_effect_3) {
+					if (swing_caster_effect == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(swing_caster_effect);
+				}
+				for (auto swing_caster_effect : activeSkillRecord->swing_caster_effect_4) {
+					if (swing_caster_effect == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(swing_caster_effect);
+				}
+				for (auto swing_caster_effect : activeSkillRecord->swing_caster_effect_5) {
+					if (swing_caster_effect == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(swing_caster_effect);
+				}
+
+				for (auto execCasterEffect : activeSkillRecord->exec_caster_effect_1) {
+					if (execCasterEffect == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execCasterEffect);
+				}
+				for (auto execCasterEffect : activeSkillRecord->exec_caster_effect_2) {
+					if (execCasterEffect == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execCasterEffect);
+				}
+				for (auto execCasterEffect : activeSkillRecord->exec_caster_effect_3) {
+					if (execCasterEffect == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execCasterEffect);
+				}
+				for (auto execCasterEffect : activeSkillRecord->exec_caster_effect_4) {
+					if (execCasterEffect == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execCasterEffect);
+				}
+				for (auto execCasterEffect : activeSkillRecord->exec_caster_effect_5) {
+					if (execCasterEffect == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execCasterEffect);
+				}
+				for (auto execEffect : activeSkillRecord->exec_effect_1) {
+					if (execEffect == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execEffect);
+				}
+				for (auto execEffect : activeSkillRecord->exec_effect_2) {
+					if (execEffect == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execEffect);
+				}
+				for (auto execEffect : activeSkillRecord->exec_effect_3) {
+					if (execEffect == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execEffect);
+				}
+				for (auto execEffect : activeSkillRecord->exec_effect_4) {
+					if (execEffect == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execEffect);
+				}
+				for (auto execEffect : activeSkillRecord->exec_effect_5) {
+					if (execEffect == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execEffect);
+				}
+			} while (innerIter->_vtptr->Next(innerIter));
+			table->__vftable->removeInnerIter(table, innerIter);
+		}
+	}
+	effectIdsForJobMap[enName] = effectIdsForJobEntry;
+	return true;
+}
+
 bool SkillIdManager::SetupAllSkillIds() {
 	skillIdsForJobMap.clear();
 	if (this->dataManagerPtr == nullptr || *this->dataManagerPtr == NULL) {
@@ -227,6 +342,7 @@ bool SkillIdManager::SetupAllSkillIds() {
 	}
 	for (auto const& [enName, krName] : jobNameMap) {
 		SetupSkillIdsForJob(enName, krName);
+		SetupEffectIdsForJob(enName, krName);
 	}
 	return true;
 }
@@ -310,6 +426,41 @@ void SkillIdManager::ResetIdsToFilter() {
 			idsToFilter.insert(skillIdsForJob.SharedSkillIds.begin(), skillIdsForJob.SharedSkillIds.end());
 		}
 	}
+	ResetEffectIdsToFilter();
+}
+
+void SkillIdManager::ResetEffectIdsToFilter() {
+	effectIdsToFilter.clear();
+	if (!g_PluginConfig.IsLoaded() || !g_PluginConfig.HasActiveProfile())
+		return;
+	auto& activeProfile = g_PluginConfig.GetActiveProfile();
+
+	//iterate over all jobnames
+	for (auto const& [enName, krName] : jobNameMap) {
+		auto jobOption = activeProfile.GetJobSkillOption(enName);
+		if (jobOption.Name.empty() || !jobOption.IsHideAny()) continue;
+		auto effectIdsForJobRecord = effectIdsForJobMap.find(enName);
+		if (effectIdsForJobRecord == effectIdsForJobMap.end()) continue;
+		auto& effectIdsForJob = effectIdsForJobRecord->second;
+		if (jobOption.HideSpec1) {
+			auto effectIdsForSpecRecord = effectIdsForJob.EffectIdsForSpec.find(1);
+			if (effectIdsForSpecRecord != effectIdsForJob.EffectIdsForSpec.end()) {
+				effectIdsToFilter.insert_range(effectIdsForSpecRecord->second);
+			}
+		}
+		if (jobOption.HideSpec2) {
+			auto effectIdsForSpecRecord = effectIdsForJob.EffectIdsForSpec.find(2);
+			if (effectIdsForSpecRecord != effectIdsForJob.EffectIdsForSpec.end()) {
+				effectIdsToFilter.insert_range(effectIdsForSpecRecord->second);
+			}
+		}
+		if (jobOption.HideSpec3) {
+			auto effectIdsForSpecRecord = effectIdsForJob.EffectIdsForSpec.find(3);
+			if (effectIdsForSpecRecord != effectIdsForJob.EffectIdsForSpec.end()) {
+				effectIdsToFilter.insert_range(effectIdsForSpecRecord->second);
+			}
+		}
+	}
 }
 
 __int64 SkillIdManager::SkillShow3KeyHelper::BuildKey(__int32 id_, __int16 variation_id_, __int16 skillskin_id_) {
@@ -374,6 +525,45 @@ void SkillIdManager::RestoreEffects() {
 	effectRestoreList.clear();
 }
 
+void SkillIdManager::RemoveAnimationsForEffect(Data::EffectRecord* effectRecord) {
+	if (effectRestoreList.contains(effectRecord->key.key)) return;
+	std::string attribute = "normal_component";
+	if (effectRecord->normal_component != nullptr && effectRecord->normal_component[0] != L'\0') {
+		effectRestoreList[effectRecord->key.key][attribute] = effectRecord->normal_component[0];
+		*effectRecord->normal_component = L'\0';
+	}
+	if (effectRecord->critical_component != nullptr && effectRecord->critical_component[0] != L'\0') {
+		attribute = "critical_component";
+		effectRestoreList[effectRecord->key.key][attribute] = effectRecord->critical_component[0];
+		*effectRecord->critical_component = L'\0';
+	}
+	if (effectRecord->back_normal_component != nullptr && effectRecord->back_normal_component[0] != L'\0') {
+		attribute = "back_normal_component";
+		effectRestoreList[effectRecord->key.key][attribute] = effectRecord->back_normal_component[0];
+		*effectRecord->back_normal_component = L'\0';
+	}
+	if (effectRecord->back_critical_component != nullptr && effectRecord->back_critical_component[0] != L'\0') {
+		attribute = "back_critical_component";
+		effectRestoreList[effectRecord->key.key][attribute] = effectRecord->back_critical_component[0];
+		*effectRecord->back_critical_component = L'\0';
+	}
+	if (effectRecord->buff_continuance_component != nullptr && effectRecord->buff_continuance_component[0] != L'\0') {
+		attribute = "buff_continuance_component";
+		effectRestoreList[effectRecord->key.key][attribute] = effectRecord->buff_continuance_component[0];
+		*effectRecord->buff_continuance_component = L'\0';
+	}
+	if (effectRecord->immune_buff_component != nullptr && effectRecord->immune_buff_component[0] != L'\0') {
+		attribute = "immune_buff_component";
+		effectRestoreList[effectRecord->key.key][attribute] = effectRecord->immune_buff_component[0];
+		*effectRecord->immune_buff_component = L'\0';
+	}
+	if (effectRecord->detach_show != nullptr && effectRecord->detach_show[0] != L'\0') {
+		attribute = "detach_show";
+		effectRestoreList[effectRecord->key.key][attribute] = effectRecord->detach_show[0];
+		*effectRecord->detach_show = L'\0';
+	}
+}
+
 void SkillIdManager::RemoveEffects() {
 	if (this->dataManagerPtr == nullptr || *this->dataManagerPtr == NULL) {
 		return;
@@ -388,42 +578,24 @@ void SkillIdManager::RemoveEffects() {
 		auto record = table->__vftable->Find_b8(table, filter.Key);
 		if (record == nullptr) continue;
 		auto effectRecord = (Data::EffectRecord*)record;
-		std::string attribute = "normal_component";
-		if (effectRecord->normal_component != nullptr && effectRecord->normal_component[0] != L'\0') {
-			effectRestoreList[filter.Key][attribute] = effectRecord->normal_component[0];
-			*effectRecord->normal_component = L'\0';
-		}
-		if (effectRecord->critical_component != nullptr && effectRecord->critical_component[0] != L'\0') {
-			attribute = "critical_component";
-			effectRestoreList[filter.Key][attribute] = effectRecord->critical_component[0];
-			*effectRecord->critical_component = L'\0';
-		}
-		if (effectRecord->back_normal_component != nullptr && effectRecord->back_normal_component[0] != L'\0') {
-			attribute = "back_normal_component";
-			effectRestoreList[filter.Key][attribute] = effectRecord->back_normal_component[0];
-			*effectRecord->back_normal_component = L'\0';
-		}
-		if (effectRecord->back_critical_component != nullptr && effectRecord->back_critical_component[0] != L'\0') {
-			attribute = "back_critical_component";
-			effectRestoreList[filter.Key][attribute] = effectRecord->back_critical_component[0];
-			*effectRecord->back_critical_component = L'\0';
-		}
-		if (effectRecord->buff_continuance_component != nullptr && effectRecord->buff_continuance_component[0] != L'\0') {
-			attribute = "buff_continuance_component";
-			effectRestoreList[filter.Key][attribute] = effectRecord->buff_continuance_component[0];
-			*effectRecord->buff_continuance_component = L'\0';
-		}
-		if (effectRecord->immune_buff_component != nullptr && effectRecord->immune_buff_component[0] != L'\0') {
-			attribute = "immune_buff_component";
-			effectRestoreList[filter.Key][attribute] = effectRecord->immune_buff_component[0];
-			*effectRecord->immune_buff_component = L'\0';
-		}
-		if (effectRecord->detach_show != nullptr && effectRecord->detach_show[0] != L'\0') {
-			attribute = "detach_show";
-			effectRestoreList[filter.Key][attribute] = effectRecord->detach_show[0];
-			*effectRecord->detach_show = L'\0';
+		RemoveAnimationsForEffect(effectRecord);
+	}
+	for (auto const effectId : effectIdsToFilter) {
+		auto record = table->__vftable->Find_b8(table, effectId);
+		if (record == nullptr) continue;
+		auto effectRecord = (Data::EffectRecord*)record;
+		RemoveAnimationsForEffect(effectRecord);
+	}
+}
+
+std::unordered_set<int> SkillIdManager::GetAllSkillIdsFromJobMap() {
+	std::unordered_set<int> allSkillIds;
+	for (auto const& [enName, skillIdsForJob] : skillIdsForJobMap) {
+		for (auto const& [specIndex, skillIds] : skillIdsForJob.SkillIdsForSpec) {
+			allSkillIds.insert_range(skillIds);
 		}
 	}
+	return allSkillIds;
 }
 
 void SkillIdManager::ReapplyEffectFilters() {

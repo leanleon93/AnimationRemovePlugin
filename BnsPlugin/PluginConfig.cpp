@@ -1,5 +1,8 @@
 #include "PluginConfig.h"
 #include "pugixml/pugixml.hpp"
+#ifdef _DEBUG
+#include <iostream>
+#endif // _DEBUG
 
 PluginConfig g_PluginConfig;
 

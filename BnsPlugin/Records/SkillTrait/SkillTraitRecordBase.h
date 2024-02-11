@@ -4,7 +4,7 @@
 namespace  Data {
 #pragma pack(push, 1)
 	const struct __declspec(align(4)) SkillTraitRecord : DrEl {
-		enum class SkillTraitJobStyleType : __int16
+		enum class SkillTraitJobStyleType : char
 		{
 			SKILLTRAIT_JOB_STYLE_BASE_1 = 0x0,
 			SKILLTRAIT_JOB_STYLE_BASE_2 = 0x1,
