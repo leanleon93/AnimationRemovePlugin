@@ -9,12 +9,12 @@
 
 class SkillIdManager {
 	struct SkillIdsForJob {
-		std::wstring EnJobName;
+		char JobId;
 		std::unordered_map<int, std::unordered_set<int>> SkillIdsForSpec;
 		std::unordered_set<int> SharedSkillIds;
 	};
 	struct EffectIdsForJob {
-		std::wstring EnJobName;
+		char JobId;
 		std::unordered_map<int, std::unordered_set<unsigned __int64>> EffectIdsForSpec;
 	};
 public:
@@ -53,35 +53,36 @@ private:
 		"Cursed Surge",
 		"Cursed Strike"
 	};
-	const std::unordered_map<std::wstring, EffectIdsForJob> fixedTargetEffectIds = {
-		{ L"Summoner", { L"Summoner", {
+	const std::unordered_map<char, EffectIdsForJob> fixedTargetEffectIds = {
+		{ 6, { 6, {
 			{ 1, { 26130068} },
 			{ 2, { 26130069} }
 		}}},
-		{ L"Warlock", { L"Warlock", {
+		{ 9, { 9, {
 			{ 2, { 55170400, 28090040, 55170390, 55170151, 28090001}}
 		}}},
-		{ L"Astromancer", { L"Astromancer", {
+		{ 14, { 14, {
 			{ 2, { 34500000}}
 		}}},
-		{ L"Zen Archer", { L"Zen Archer", {
+		{ 12, { 12, {
 			{ 3, { 33800095, 33800048}}
 		}}},
 	};
+	std::unordered_set<char> jobIds;
 	std::unordered_map<std::wstring, char> jobNameMap;
-	std::unordered_map<std::wstring, SkillIdsForJob> skillIdsForJobMap;
-	std::unordered_map<std::wstring, EffectIdsForJob> effectIdsForJobMap;
+	std::unordered_map<char, SkillIdsForJob> skillIdsForJobMap;
+	std::unordered_map<char, EffectIdsForJob> effectIdsForJobMap;
 	std::unordered_set<int> GetAllSkillIdsFromJobMap();
 	std::unordered_set<int> idsToFilter;
 	std::unordered_set<unsigned __int64> effectIdsToFilter;
 	void ResetEffectIdsToFilter();
 	std::unordered_map<unsigned __int64, std::unordered_map<std::string, wchar_t>> effectRestoreList;
-	char GetKrJobForEnName(std::wstring const& enName);
+	char GetJobIdForEnName(std::wstring const& enName);
 	bool SetupJobNameMap();
 	bool SetupAllSkillIds();
 	bool SetupSkillShowTableId();
-	bool SetupSkillIdsForJob(const std::wstring& enName, char krName);
-	bool SetupEffectIdsForJob(const std::wstring& enName, char krName);
+	bool SetupSkillIdsForJob(char jobId);
+	bool SetupEffectIdsForJob(char jobId);
 	void AddIds(Data::SkillTraitRecord const* record, int const* ids, int size, SkillIdsForJob& skillIdsForJobEntry);
 	void AddFixedIds(Data::SkillTraitRecord const* record, SkillIdsForJob& skillIdsForJobEntry);
 	void AddVariableIds(Data::SkillTraitRecord const* record, SkillIdsForJob& skillIdsForJobEntry);
@@ -123,7 +124,10 @@ private:
 		{ L"itemskill", false },
 		{ L"skill-inheritance", false }
 	};
-	std::unordered_map<std::wstring, char> jobNameFallbackMap = {
+	const std::unordered_set<char> jobIdsFallback = {
+		1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16
+	};
+	const std::unordered_map<std::wstring, char> jobNameFallbackMap = {
 		{ L"Blade Master", 1 },
 		{ L"Kung Fu Master", 2 },
 		{ L"Force Master", 3 },

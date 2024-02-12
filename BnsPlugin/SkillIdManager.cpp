@@ -18,8 +18,11 @@ __int16 SkillIdManager::GetSkillshowTableId() const {
 	return skillshowTableId;
 }
 
-char SkillIdManager::GetKrJobForEnName(std::wstring const& enName) {
+char SkillIdManager::GetJobIdForEnName(std::wstring const& enName) {
 	if (auto it = jobNameMap.find(enName); it != jobNameMap.end()) {
+		return it->second;
+	}
+	if (auto it = jobNameFallbackMap.find(enName); it != jobNameFallbackMap.end()) {
 		return it->second;
 	}
 	return 0;
@@ -209,7 +212,7 @@ void SkillIdManager::AddItemSkills(SkillIdsForJob& skillIdsForJobEntry) {
 	}
 }
 
-bool SkillIdManager::SetupSkillIdsForJob(const std::wstring& enName, char krName) {
+bool SkillIdManager::SetupSkillIdsForJob(char jobId) {
 	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
 	if (!versionCheckSuccess.contains(L"skill-trait") || !versionCheckSuccess[L"skill-trait"]) {
 		return false;
@@ -217,7 +220,7 @@ bool SkillIdManager::SetupSkillIdsForJob(const std::wstring& enName, char krName
 	const auto table = DataHelper::GetTable(manager, L"skill-trait");
 	if (table == nullptr) return false;
 	auto skillIdsForJobEntry = SkillIdsForJob();
-	skillIdsForJobEntry.EnJobName = enName;
+	skillIdsForJobEntry.JobId = jobId;
 
 	auto innerIter = table->__vftable->createInnerIter_d0(table);
 	//loop
@@ -226,19 +229,19 @@ bool SkillIdManager::SetupSkillIdsForJob(const std::wstring& enName, char krName
 		if (!innerIter->_vtptr->IsValid(innerIter)) continue;
 		auto record = (Data::SkillTraitRecord*)innerIter->_vtptr->Ptr(innerIter);
 		if (record == nullptr) continue;
-		if (record->key.job != krName) continue;
+		if (record->key.job != jobId) continue;
 		AddFixedIds(record, skillIdsForJobEntry);
 		AddVariableIds(record, skillIdsForJobEntry);
 	} while (innerIter->_vtptr->Next(innerIter));
 	AddChildrenSkillIds(skillIdsForJobEntry);
 	AddItemSkills(skillIdsForJobEntry);
 	FilterBracelet(skillIdsForJobEntry);
-	skillIdsForJobMap[enName] = skillIdsForJobEntry;
+	skillIdsForJobMap[jobId] = skillIdsForJobEntry;
 	table->__vftable->removeInnerIter(table, innerIter);
 	return true;
 }
 
-bool SkillIdManager::SetupEffectIdsForJob(const std::wstring& enName, [[maybe_unused]] char krName) {
+bool SkillIdManager::SetupEffectIdsForJob(char jobId) {
 	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
 	if (!versionCheckSuccess.contains(L"skill3") || !versionCheckSuccess[L"skill3"]) {
 		return false;
@@ -246,13 +249,13 @@ bool SkillIdManager::SetupEffectIdsForJob(const std::wstring& enName, [[maybe_un
 	const auto table = DataHelper::GetTable(manager, L"skill3");
 	if (table == nullptr) return false;
 	auto effectIdsForJobEntry = EffectIdsForJob();
-	effectIdsForJobEntry.EnJobName = enName;
+	effectIdsForJobEntry.JobId = jobId;
 
-	auto skillIdsForJobEntry = skillIdsForJobMap.find(enName);
+	auto skillIdsForJobEntry = skillIdsForJobMap.find(jobId);
 	if (skillIdsForJobEntry == skillIdsForJobMap.end()) return false;
 	auto const& skillIdsForJob = skillIdsForJobEntry->second;
 
-	auto const& fixedTargetEffectIdsForJob = fixedTargetEffectIds.find(enName);
+	auto const& fixedTargetEffectIdsForJob = fixedTargetEffectIds.find(jobId);
 
 	for (auto const& skillIdsForSpec = skillIdsForJob.SkillIdsForSpec; auto const& [specIndex, skillIds] : skillIdsForSpec) {
 		if (fixedTargetEffectIdsForJob != fixedTargetEffectIds.end()) {
@@ -353,7 +356,7 @@ bool SkillIdManager::SetupEffectIdsForJob(const std::wstring& enName, [[maybe_un
 			table->__vftable->removeInnerIter(table, innerIter);
 		}
 	}
-	effectIdsForJobMap[enName] = effectIdsForJobEntry;
+	effectIdsForJobMap[jobId] = effectIdsForJobEntry;
 	return true;
 }
 
@@ -362,9 +365,9 @@ bool SkillIdManager::SetupAllSkillIds() {
 	if (this->dataManagerPtr == nullptr || *this->dataManagerPtr == NULL) {
 		return false;
 	}
-	for (auto const& [enName, krName] : jobNameMap) {
-		if (SetupSkillIdsForJob(enName, krName)) {
-			SetupEffectIdsForJob(enName, krName);
+	for (auto const& jobId : jobIds) {
+		if (SetupSkillIdsForJob(jobId)) {
+			SetupEffectIdsForJob(jobId);
 		}
 	}
 	return true;
@@ -375,9 +378,10 @@ bool SkillIdManager::SetupJobNameMap() {
 		return false;
 	}
 	jobNameMap.clear();
+	jobIds.clear();
 	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
 	if (!versionCheckSuccess.contains(L"job") || !versionCheckSuccess[L"job"]) {
-		CriticalFail = true;
+		jobIds = jobIdsFallback;
 		return true;
 	}
 	const auto table = DataHelper::GetTable(manager, L"job");
@@ -390,6 +394,7 @@ bool SkillIdManager::SetupJobNameMap() {
 		if (!innerIter->_vtptr->IsValid(innerIter)) continue;
 		auto record = (Data::JobRecord*)innerIter->_vtptr->Ptr(innerIter);
 		if (record == nullptr) continue;
+		jobIds.insert(record->key.job);
 		auto enJobName = (Data::TextRecord*)textTable->__vftable->Find_b8(textTable, record->name2);
 		jobNameMap[enJobName->text.data] = record->key.job;
 #ifdef _DEBUG
@@ -412,7 +417,7 @@ bool SkillIdManager::CompatabilityCheck() {
 	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
 	for (auto const& tableName : usedTables) {
 		if (auto table = DataHelper::GetTable(manager, tableName.c_str()); table == nullptr) {
-			continue;
+			return false;
 		}
 #ifdef _DEBUG
 		std::wcout << "Table " << tableName << " found." << std::endl;
@@ -471,11 +476,12 @@ void SkillIdManager::ResetIdsToFilter() {
 		return;
 	auto& activeProfile = g_PluginConfig.GetActiveProfile();
 
-	//iterate over all jobnames
-	for (auto const& [enName, krName] : jobNameMap) {
-		auto jobOption = activeProfile.GetJobSkillOption(enName);
+	//iterate over filters
+	for (auto const& jobOption : activeProfile.SkillFilters) {
 		if (jobOption.Name.empty() || !jobOption.IsHideAny()) continue;
-		auto skillIdsForJobRecord = skillIdsForJobMap.find(enName);
+		auto jobId = GetJobIdForEnName(jobOption.Name);
+		if (jobId == 0) continue;
+		auto skillIdsForJobRecord = skillIdsForJobMap.find(jobId);
 		if (skillIdsForJobRecord == skillIdsForJobMap.end()) continue;
 		auto& skillIdsForJob = skillIdsForJobRecord->second;
 		if (jobOption.HideSpec1) {
@@ -509,11 +515,12 @@ void SkillIdManager::ResetEffectIdsToFilter() {
 		return;
 	auto& activeProfile = g_PluginConfig.GetActiveProfile();
 
-	//iterate over all jobnames
-	for (auto const& [enName, krName] : jobNameMap) {
-		auto jobOption = activeProfile.GetJobSkillOption(enName);
+	//iterate over filters
+	for (auto const& jobOption : activeProfile.SkillFilters) {
 		if (jobOption.Name.empty() || !jobOption.IsHideAny()) continue;
-		auto effectIdsForJobRecord = effectIdsForJobMap.find(enName);
+		auto jobId = GetJobIdForEnName(jobOption.Name);
+		if (jobId == 0) continue;
+		auto effectIdsForJobRecord = effectIdsForJobMap.find(jobId);
 		if (effectIdsForJobRecord == effectIdsForJobMap.end()) continue;
 		auto& effectIdsForJob = effectIdsForJobRecord->second;
 		if (jobOption.HideSpec1) {
