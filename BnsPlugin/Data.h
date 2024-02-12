@@ -118,8 +118,17 @@ struct DrElIter
 struct __declspec(align(4)) DrTableDef {
 	const wchar_t* name;
 	__int16 type;
+	union Version {
+		struct {
+			__int16 major_ver;
+			__int16 minor_ver;
+		};
+		unsigned __int32 ver;
+	};
+	Version version;
 };
 #pragma pack(pop)
+
 #pragma pack(push, 4)
 struct DrLoaderDef {
 	DrDataTable* table;
@@ -156,4 +165,5 @@ public:
 	static DrDataTable* GetTable(Data::DataManager* dataManager, int tableId);
 	static DrDataTable* GetTable(Data::DataManager* dataManager, const wchar_t* tableName);
 	static __int16 GetTableId(Data::DataManager* dataManager, const wchar_t* tableName);
+	static const DrTableDef* GetTableDef(Data::DataManager* dataManager, const wchar_t* tableName);
 };

@@ -21,6 +21,7 @@ public:
 	__int16 GetSkillshowTableId() const;
 	bool Setup();
 	bool IsSetupComplete() const;
+	bool IsCriticalFail() const;
 	void ResetIdsToFilter();
 	const std::unordered_set<int>& GetIdsToFilter() const;
 	Data::DataManager* GetDataManager();
@@ -35,6 +36,7 @@ private:
 	__int16 skillshowTableId;
 	__int64 const* dataManagerPtr;
 	bool SetupComplete;
+	bool CriticalFail;
 	const std::vector<int> idExclusionList = {
 		66104,
 		66105,
@@ -93,6 +95,52 @@ private:
 	void RestoreEffects();
 	void RemoveEffects();
 	void RemoveAnimationsForEffect(Data::EffectRecord* effectRecord);
+	bool CompatabilityCheck();
+	const std::unordered_set<std::wstring> usedTables = {
+		L"skillshow3",
+		L"effect",
+		L"job",
+		L"skill3",
+		L"skill-trait",
+		L"itemskill",
+		L"skill-inheritance"
+	};
+	const std::unordered_map<std::wstring, __int32> confirmedMajorMinorVersions = {
+		{ L"skillshow3", 655362 },
+		{ L"effect", 34 },
+		{ L"job", 3997696 },
+		{ L"skill3", 65546 },
+		{ L"skill-trait", 720896 },
+		{ L"itemskill", 851968 },
+		{ L"skill-inheritance", 262144 }
+	};
+	std::unordered_map<std::wstring, bool> versionCheckSuccess = {
+		{ L"skillshow3", false },
+		{ L"effect", false },
+		{ L"job", false },
+		{ L"skill3", false },
+		{ L"skill-trait", false },
+		{ L"itemskill", false },
+		{ L"skill-inheritance", false }
+	};
+	std::unordered_map<std::wstring, char> jobNameFallbackMap = {
+		{ L"Blade Master", 1 },
+		{ L"Kung Fu Master", 2 },
+		{ L"Force Master", 3 },
+		{ L"Gunslinger", 4 },
+		{ L"Destroyer", 5 },
+		{ L"Summoner", 6 },
+		{ L"Assassin", 7 },
+		{ L"Blade Dancer", 8 },
+		{ L"Warlock", 9 },
+		{ L"Soul Fighter", 10 },
+		{ L"Warden", 11 },
+		{ L"Zen Archer", 12 },
+		{ L"Astromancer", 14 },
+		{ L"Dual Blade", 15 },
+		{ L"Musician", 16 }
+	};
+	bool AllVersionsSuccess() const;
 };
 
 extern SkillIdManager g_SkillIdManager;

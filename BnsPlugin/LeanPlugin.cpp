@@ -154,7 +154,7 @@ BSMessaging* Messaging;
 /// From Tonic
 /// </summary>
 /// <returns></returns>
-void WINAPI InitMessaging() {
+static void WINAPI InitMessaging() {
 #ifdef _DEBUG
 	std::cout << "InitMessaging" << std::endl;
 #endif // _DEBUG
@@ -199,7 +199,7 @@ void WINAPI InitMessaging() {
 
 static void InitSkillIdManager() {
 	while (true) {
-		if (g_SkillIdManager.Setup()) {
+		if (g_SkillIdManager.Setup() || g_SkillIdManager.IsCriticalFail()) {
 			break;
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));

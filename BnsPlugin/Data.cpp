@@ -32,6 +32,23 @@ DrDataTable* DataHelper::GetTable(Data::DataManager* dataManager, const wchar_t*
 	return nullptr;
 }
 
+const DrTableDef* DataHelper::GetTableDef(Data::DataManager* dataManager, const wchar_t* tableName) {
+	if (dataManager == nullptr) {
+		return nullptr;
+	}
+	int arraySize = sizeof(dataManager->_loaderDefs) / sizeof(dataManager->_loaderDefs[0]);
+	for (int i = 0; i < arraySize; i++) {
+		auto loaderDef = dataManager->_loaderDefs[i];
+		auto tableDef = loaderDef.tableDef;
+		if (tableDef == nullptr) continue;
+		auto name = tableDef->name;
+		if (wcscmp(name, tableName) == 0) {
+			return tableDef;
+		}
+	}
+	return nullptr;
+}
+
 __int16 DataHelper::GetTableId(Data::DataManager* dataManager, const wchar_t* tableName) {
 	if (dataManager == nullptr) {
 		return 0;

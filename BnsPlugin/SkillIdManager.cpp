@@ -7,6 +7,10 @@
 #include "Records/Skill3/Skill3ActiveSkillRecord.h"
 #include "Records/Itemskill/ItemskillRecordBase.h"
 #include "PluginConfig.h"
+#include <Windows.h>
+#ifdef _DEBUG
+#include <iostream>
+#endif // _DEBUG
 
 SkillIdManager g_SkillIdManager;
 
@@ -36,6 +40,9 @@ bool SkillIdManager::SetupSkillShowTableId() {
 
 std::unordered_set<int> SkillIdManager::GetInheritedIds(int id) {
 	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
+	if (!versionCheckSuccess.contains(L"skill-inheritance") || !versionCheckSuccess[L"skill-inheritance"]) {
+		return {};
+	}
 	const auto table = DataHelper::GetTable(manager, L"skill-inheritance");
 	if (table == nullptr) return {};
 	auto innerIter = table->__vftable->createInnerIter_d0(table);
@@ -56,6 +63,9 @@ std::unordered_set<int> SkillIdManager::GetInheritedIds(int id) {
 
 std::unordered_set<int> SkillIdManager::GetChildSkillIds(int id) {
 	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
+	if (!versionCheckSuccess.contains(L"skill3") || !versionCheckSuccess[L"skill3"]) {
+		return {};
+	}
 	const auto table = DataHelper::GetTable(manager, L"skill3");
 	if (table == nullptr) return {};
 	auto innerIter = table->__vftable->createInnerIter_d0(table);
@@ -130,6 +140,9 @@ static bool containsSubstring(const wchar_t* str, const wchar_t* substr) {
 
 bool SkillIdManager::IsBraceletId(int id) {
 	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
+	if (!versionCheckSuccess.contains(L"skill3") || !versionCheckSuccess[L"skill3"]) {
+		return false;
+	}
 	const auto table = DataHelper::GetTable(manager, L"skill3");
 	if (table == nullptr) return {};
 	auto innerIter = table->__vftable->createInnerIter_d0(table);
@@ -167,6 +180,9 @@ void SkillIdManager::FilterBracelet(SkillIdsForJob& skillIdsForJobEntry) {
 
 std::unordered_set<int> SkillIdManager::GetItemSkills(int id) {
 	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
+	if (!versionCheckSuccess.contains(L"itemskill") || !versionCheckSuccess[L"itemskill"]) {
+		return {};
+	}
 	const auto table = DataHelper::GetTable(manager, L"itemskill");
 	if (table == nullptr) return {};
 	auto innerIter = table->__vftable->createInnerIter_d0(table);
@@ -195,6 +211,9 @@ void SkillIdManager::AddItemSkills(SkillIdsForJob& skillIdsForJobEntry) {
 
 bool SkillIdManager::SetupSkillIdsForJob(const std::wstring& enName, char krName) {
 	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
+	if (!versionCheckSuccess.contains(L"skill-trait") || !versionCheckSuccess[L"skill-trait"]) {
+		return false;
+	}
 	const auto table = DataHelper::GetTable(manager, L"skill-trait");
 	if (table == nullptr) return false;
 	auto skillIdsForJobEntry = SkillIdsForJob();
@@ -221,6 +240,9 @@ bool SkillIdManager::SetupSkillIdsForJob(const std::wstring& enName, char krName
 
 bool SkillIdManager::SetupEffectIdsForJob(const std::wstring& enName, [[maybe_unused]] char krName) {
 	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
+	if (!versionCheckSuccess.contains(L"skill3") || !versionCheckSuccess[L"skill3"]) {
+		return false;
+	}
 	const auto table = DataHelper::GetTable(manager, L"skill3");
 	if (table == nullptr) return false;
 	auto effectIdsForJobEntry = EffectIdsForJob();
@@ -341,8 +363,9 @@ bool SkillIdManager::SetupAllSkillIds() {
 		return false;
 	}
 	for (auto const& [enName, krName] : jobNameMap) {
-		SetupSkillIdsForJob(enName, krName);
-		SetupEffectIdsForJob(enName, krName);
+		if (SetupSkillIdsForJob(enName, krName)) {
+			SetupEffectIdsForJob(enName, krName);
+		}
 	}
 	return true;
 }
@@ -353,6 +376,10 @@ bool SkillIdManager::SetupJobNameMap() {
 	}
 	jobNameMap.clear();
 	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
+	if (!versionCheckSuccess.contains(L"job") || !versionCheckSuccess[L"job"]) {
+		CriticalFail = true;
+		return true;
+	}
 	const auto table = DataHelper::GetTable(manager, L"job");
 	const auto textTable = DataHelper::GetTable(manager, L"text");
 	if (table == nullptr || textTable == nullptr) {
@@ -365,12 +392,59 @@ bool SkillIdManager::SetupJobNameMap() {
 		if (record == nullptr) continue;
 		auto enJobName = (Data::TextRecord*)textTable->__vftable->Find_b8(textTable, record->name2);
 		jobNameMap[enJobName->text.data] = record->key.job;
+#ifdef _DEBUG
+		std::wcout << "{ L\"" << enJobName->text.data << "\", " << +record->key.job << " }," << std::endl;
+#endif // _DEBUG
 	} while (innerIter->_vtptr->Next(innerIter));
 	table->__vftable->removeInnerIter(table, innerIter);
 	return true;
 }
 
+bool SkillIdManager::AllVersionsSuccess() const {
+	auto allSuccess = std::ranges::all_of(versionCheckSuccess, [](auto const& kvp) { return kvp.second; });
+	return allSuccess;
+}
+
+bool SkillIdManager::CompatabilityCheck() {
+	if (this->dataManagerPtr == nullptr || *this->dataManagerPtr == NULL) {
+		return false;
+	}
+	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
+	for (auto const& tableName : usedTables) {
+		if (auto table = DataHelper::GetTable(manager, tableName.c_str()); table == nullptr) {
+			continue;
+		}
+#ifdef _DEBUG
+		std::wcout << "Table " << tableName << " found." << std::endl;
+#endif // _DEBUG
+		auto tableDef = DataHelper::GetTableDef(manager, tableName.c_str());
+		if (tableDef == nullptr) {
+			continue;
+		}
+#ifdef _DEBUG
+		std::wcout << "\tID: " << tableDef->type << std::endl;
+		std::wcout << "\tVersion union: " << tableDef->version.ver << std::endl;
+		std::wcout << "\tMajor Version: " << tableDef->version.major_ver << std::endl;
+		std::wcout << "\tMinor Version: " << tableDef->version.minor_ver << std::endl;
+		printf("\tAddress of %s is %p\n", "type", &tableDef->type);
+		std::cout << std::endl;
+#endif // _DEBUG
+		auto confirmedVersion = confirmedMajorMinorVersions.find(tableName);
+		if (confirmedVersion == confirmedMajorMinorVersions.end()) {
+			continue;
+		}
+		if (tableDef->version.ver == confirmedVersion->second) {
+			versionCheckSuccess[tableName] = true;
+		}
+	}
+	return true;
+}
+
 bool SkillIdManager::Setup() {
+	if (auto successVersionCheck = CompatabilityCheck(); !successVersionCheck) return false;
+	if (!AllVersionsSuccess()) {
+		MessageBox(nullptr, L"AnimFilter version is not 100% compatible with the game version.\nSome Animations might not be removed but your game will not break.\nPlease update the plugin if available.", L"AnimFilter Version Mismatch", MB_OK | MB_ICONWARNING);
+	}
 	auto success1 = SetupJobNameMap();
 	if (!success1) return false;
 	auto success2 = SetupAllSkillIds();
@@ -498,6 +572,9 @@ void SkillIdManager::RestoreEffects() {
 		return;
 	}
 	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
+	if (!versionCheckSuccess.contains(L"effect") || !versionCheckSuccess[L"effect"]) {
+		return;
+	}
 	const auto table = DataHelper::GetTable(manager, L"effect");
 	if (table == nullptr) return;
 	for (auto& [key, kvp] : effectRestoreList) {
@@ -570,6 +647,9 @@ void SkillIdManager::RemoveEffects() {
 	}
 	if (!g_PluginConfig.IsLoaded() || !g_PluginConfig.HasActiveProfile()) return;
 	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
+	if (!versionCheckSuccess.contains(L"effect") || !versionCheckSuccess[L"effect"]) {
+		return;
+	}
 	const auto table = DataHelper::GetTable(manager, L"effect");
 	if (table == nullptr) return;
 	auto& effectFilters = g_PluginConfig.GetActiveProfile().EffectFilters;
@@ -601,4 +681,8 @@ std::unordered_set<int> SkillIdManager::GetAllSkillIdsFromJobMap() {
 void SkillIdManager::ReapplyEffectFilters() {
 	RestoreEffects();
 	RemoveEffects();
+}
+
+bool SkillIdManager::IsCriticalFail() const {
+	return CriticalFail;
 }
