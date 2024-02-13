@@ -372,6 +372,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="LeanPlugin.h" />
     <ClInclude Include="PluginConfig.h" />
+    <ClInclude Include="Records\EffectGroup\EffectGroupBase.h" />
     <ClInclude Include="Records\Effect\EffectRecordBase.h" />
     <ClInclude Include="Records\Itemskill\ItemskillRecordBase.h" />
     <ClInclude Include="Records\Job\JobRecordBase.h" />

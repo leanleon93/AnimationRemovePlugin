@@ -96,6 +96,7 @@ private:
 	void RestoreEffects();
 	void RemoveEffects();
 	void RemoveAnimationsForEffect(Data::EffectRecord* effectRecord);
+	std::unordered_set<unsigned __int64> GetEffectIdsForEffectGroup(unsigned __int64 effectGroupId);
 	bool CompatabilityCheck();
 	const std::unordered_set<std::wstring> usedTables = {
 		L"skillshow3",
@@ -104,7 +105,8 @@ private:
 		L"skill3",
 		L"skill-trait",
 		L"itemskill",
-		L"skill-inheritance"
+		L"skill-inheritance",
+		L"effect-group"
 	};
 
 	const std::unordered_map<std::wstring, __int32> confirmedMajorMinorVersions = {
@@ -114,7 +116,8 @@ private:
 		{ L"skill3", 65546 },
 		{ L"skill-trait", 720896 },
 		{ L"itemskill", 851968 },
-		{ L"skill-inheritance", 262144 }
+		{ L"skill-inheritance", 262144 },
+		{ L"effect-group", 458752 }
 	};
 
 	std::unordered_map<std::wstring, bool> versionCheckSuccess = {
@@ -124,8 +127,9 @@ private:
 		{ L"skill3", false },
 		{ L"skill-trait", false },
 		{ L"itemskill", false },
-		{ L"skill-inheritance", false }
-	};
+		{ L"skill-inheritance", false },
+		{ L"effect-group", false } };
+
 	const std::unordered_set<char> jobIdsFallback = {
 		1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16
 	};

@@ -11,6 +11,7 @@
 #ifdef _DEBUG
 #include <iostream>
 #endif // _DEBUG
+#include "Records/EffectGroup/EffectGroupBase.h"
 
 SkillIdManager g_SkillIdManager;
 
@@ -241,6 +242,24 @@ bool SkillIdManager::SetupSkillIdsForJob(char jobId) {
 	return true;
 }
 
+std::unordered_set<unsigned __int64> SkillIdManager::GetEffectIdsForEffectGroup(unsigned __int64 effectGroupId) {
+	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
+	if (!versionCheckSuccess.contains(L"effect-group") || !versionCheckSuccess[L"effect-group"]) {
+		return {};
+	}
+	const auto table = DataHelper::GetTable(manager, L"effect-group");
+	if (table == nullptr) return  { };
+	auto record = table->__vftable->Find_b8(table, effectGroupId);
+	if (record == nullptr) return  { };
+	auto effectGroupRecord = (Data::EffectGroupRecord*)record;
+	std::unordered_set<unsigned __int64> effectIds;
+	for (auto effectId : effectGroupRecord->effect) {
+		if (effectId == 0) continue;
+		effectIds.insert(effectId);
+	}
+	return effectIds;
+}
+
 bool SkillIdManager::SetupEffectIdsForJob(char jobId) {
 	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
 	if (!versionCheckSuccess.contains(L"skill3") || !versionCheckSuccess[L"skill3"]) {
@@ -332,25 +351,30 @@ bool SkillIdManager::SetupEffectIdsForJob(char jobId) {
 					if (execCasterEffect == 0) continue;
 					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execCasterEffect);
 				}
-				for (auto execEffect : activeSkillRecord->exec_effect_1) {
-					if (execEffect == 0) continue;
-					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execEffect);
+				for (auto execEffectGroupId : activeSkillRecord->exec_effect_1) {
+					if (execEffectGroupId == 0) continue;
+					auto effectIds = GetEffectIdsForEffectGroup(execEffectGroupId);
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(effectIds.begin(), effectIds.end());
 				}
-				for (auto execEffect : activeSkillRecord->exec_effect_2) {
-					if (execEffect == 0) continue;
-					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execEffect);
+				for (auto execEffectGroupId : activeSkillRecord->exec_effect_2) {
+					if (execEffectGroupId == 0) continue;
+					auto effectIds = GetEffectIdsForEffectGroup(execEffectGroupId);
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(effectIds.begin(), effectIds.end());
 				}
-				for (auto execEffect : activeSkillRecord->exec_effect_3) {
-					if (execEffect == 0) continue;
-					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execEffect);
+				for (auto execEffectGroupId : activeSkillRecord->exec_effect_3) {
+					if (execEffectGroupId == 0) continue;
+					auto effectIds = GetEffectIdsForEffectGroup(execEffectGroupId);
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(effectIds.begin(), effectIds.end());
 				}
-				for (auto execEffect : activeSkillRecord->exec_effect_4) {
-					if (execEffect == 0) continue;
-					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execEffect);
+				for (auto execEffectGroupId : activeSkillRecord->exec_effect_4) {
+					if (execEffectGroupId == 0) continue;
+					auto effectIds = GetEffectIdsForEffectGroup(execEffectGroupId);
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(effectIds.begin(), effectIds.end());
 				}
-				for (auto execEffect : activeSkillRecord->exec_effect_5) {
-					if (execEffect == 0) continue;
-					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execEffect);
+				for (auto execEffectGroupId : activeSkillRecord->exec_effect_5) {
+					if (execEffectGroupId == 0) continue;
+					auto effectIds = GetEffectIdsForEffectGroup(execEffectGroupId);
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(effectIds.begin(), effectIds.end());
 				}
 			} while (innerIter->_vtptr->Next(innerIter));
 			table->__vftable->removeInnerIter(table, innerIter);

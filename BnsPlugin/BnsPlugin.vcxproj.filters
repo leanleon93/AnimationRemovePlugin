@@ -125,5 +125,8 @@
     <ClInclude Include="Records\Itemskill\ItemskillRecordBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Records\EffectGroup\EffectGroupBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
