@@ -106,6 +106,7 @@ private:
 		L"itemskill",
 		L"skill-inheritance"
 	};
+
 	const std::unordered_map<std::wstring, __int32> confirmedMajorMinorVersions = {
 		{ L"skillshow3", 655362 },
 		{ L"effect", 34 },
@@ -115,6 +116,7 @@ private:
 		{ L"itemskill", 851968 },
 		{ L"skill-inheritance", 262144 }
 	};
+
 	std::unordered_map<std::wstring, bool> versionCheckSuccess = {
 		{ L"skillshow3", false },
 		{ L"effect", false },
