@@ -92,6 +92,16 @@ static void SetProfiles(pugi::xml_document const& doc, AnimFilterConfig* animFil
 			}
 			profile.EffectFilters.push_back(effectOption);
 		}
+		for (pugi::xml_node animSwapOptionNode : profileNode.child("swap_options").children("option")) {
+			AnimFilterConfig::AnimFilterProfile::SwapOption swapOption{};
+			auto targetSkillId = animSwapOptionNode.attribute("targetSkillId").as_int();
+			swapOption.TargetSkillId = targetSkillId;
+			auto animationSkillId = animSwapOptionNode.attribute("animationSkillId").as_int();
+			swapOption.AnimationSkillId = animationSkillId;
+			auto animationSkillVariation = animSwapOptionNode.attribute("animationSkillVariation").as_int();
+			swapOption.AnimationSkillVariation = animationSkillVariation;
+			profile.AnimationSwaps[targetSkillId] = swapOption;
+		}
 		for (pugi::xml_node skillOptionNode : profileNode.child("skill_options").children("option")) {
 			AnimFilterConfig::AnimFilterProfile::SkillOption skillOption;
 			auto name = skillOptionNode.attribute("name").as_string();

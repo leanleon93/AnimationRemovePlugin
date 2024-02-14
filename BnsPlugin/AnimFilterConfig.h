@@ -30,8 +30,14 @@ struct AnimFilterConfig {
 				return HideSpec1 || HideSpec2 || HideSpec3;
 			}
 		};
+		struct SwapOption {
+			__int32 TargetSkillId;
+			__int32 AnimationSkillId;
+			__int32 AnimationSkillVariation;
+		};
 		std::vector<EffectOption> EffectFilters;
 		std::vector<SkillOption> SkillFilters;
+		std::unordered_map<__int32, SwapOption> AnimationSwaps;
 		SkillOption GetJobSkillOption(std::wstring_view jobName) const {
 			for (const auto& skillOption : SkillFilters) {
 				if (skillOption.Name == jobName) {
