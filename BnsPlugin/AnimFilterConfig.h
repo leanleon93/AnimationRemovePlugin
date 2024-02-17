@@ -13,6 +13,7 @@ struct AnimFilterConfig {
 	struct AnimFilterProfile {
 		std::string Name;
 		std::wstring Text;
+		bool HideTree = false;
 		struct EffectOption {
 			unsigned __int64 Key;
 			std::string Alias;

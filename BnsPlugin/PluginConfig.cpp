@@ -73,6 +73,11 @@ static void SetProfiles(pugi::xml_document const& doc, AnimFilterConfig* animFil
 		auto profileId = profileNode.attribute("name").as_int();
 		AnimFilterConfig::AnimFilterProfile profile;
 		profile.Name = profileNode.attribute("name").as_string();
+		if (pugi::xml_node extraoptionsNode = profileNode.child("extra_options"); extraoptionsNode) {
+			if (extraoptionsNode.attribute("hideTree") != nullptr) {
+				profile.HideTree = extraoptionsNode.attribute("hideTree").as_bool();
+			}
+		}
 		if (pugi::xml_node textNode = profileNode.child("text"); textNode) {
 			auto text = textNode.text();
 			profile.Text = PugiCharPtrToWString(text.as_string());

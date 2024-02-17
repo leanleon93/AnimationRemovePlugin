@@ -48,6 +48,17 @@ private:
 		66024,
 		66050
 	};
+
+	const std::unordered_set<int> bardTreeExclusionIds = {
+		242500,
+		242501,
+		242502,
+		242503,
+		242504,
+		242505,
+		242506,
+		242507
+	};
 	const std::vector<std::string> skillNameExclusionList = {
 		"Cursed Cry",
 		"Cursed Surge",

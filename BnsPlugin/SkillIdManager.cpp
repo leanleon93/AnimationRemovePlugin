@@ -530,6 +530,12 @@ void SkillIdManager::ResetIdsToFilter() {
 			idsToFilter.insert(skillIdsForJob.SharedSkillIds.begin(), skillIdsForJob.SharedSkillIds.end());
 		}
 	}
+	//remove bardTreeExclusionIds from idsToFilter if not hidetree
+	if (!activeProfile.HideTree) {
+		for (auto id : bardTreeExclusionIds) {
+			idsToFilter.erase(id);
+		}
+	}
 	ResetEffectIdsToFilter();
 }
 
