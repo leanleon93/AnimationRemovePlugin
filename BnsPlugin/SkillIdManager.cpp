@@ -494,6 +494,24 @@ Data::DataManager* SkillIdManager::GetDataManager() {
 	return reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
 }
 
+static void addIdsForSpec(std::unordered_set<int>& idsToFilter, std::unordered_map<int, std::unordered_set<int>>& skillIdsForSpec, int specIndex) {
+	auto skillIdsForSpecRecord = skillIdsForSpec.find(specIndex);
+	if (skillIdsForSpecRecord != skillIdsForSpec.end()) {
+		for (auto id : skillIdsForSpecRecord->second) {
+			idsToFilter.insert(id);
+		}
+	}
+}
+
+static void removeIdsForSpec(std::unordered_set<int>& idsToFilter, std::unordered_map<int, std::unordered_set<int>>& skillIdsForSpec, int specIndex) {
+	auto skillIdsForSpecRecord = skillIdsForSpec.find(specIndex);
+	if (skillIdsForSpecRecord != skillIdsForSpec.end()) {
+		for (auto id : skillIdsForSpecRecord->second) {
+			idsToFilter.erase(id);
+		}
+	}
+}
+
 void SkillIdManager::ResetIdsToFilter() {
 	idsToFilter.clear();
 	if (!g_PluginConfig.IsLoaded() || !g_PluginConfig.HasActiveProfile())
@@ -508,26 +526,28 @@ void SkillIdManager::ResetIdsToFilter() {
 		auto skillIdsForJobRecord = skillIdsForJobMap.find(jobId);
 		if (skillIdsForJobRecord == skillIdsForJobMap.end()) continue;
 		auto& skillIdsForJob = skillIdsForJobRecord->second;
+		//add ids to filter if hide
 		if (jobOption.HideSpec1) {
-			auto skillIdsForSpecRecord = skillIdsForJob.SkillIdsForSpec.find(1);
-			if (skillIdsForSpecRecord != skillIdsForJob.SkillIdsForSpec.end()) {
-				idsToFilter.insert_range(skillIdsForSpecRecord->second);
-			}
+			addIdsForSpec(idsToFilter, skillIdsForJob.SkillIdsForSpec, 1);
 		}
 		if (jobOption.HideSpec2) {
-			auto skillIdsForSpecRecord = skillIdsForJob.SkillIdsForSpec.find(2);
-			if (skillIdsForSpecRecord != skillIdsForJob.SkillIdsForSpec.end()) {
-				idsToFilter.insert_range(skillIdsForSpecRecord->second);
-			}
+			addIdsForSpec(idsToFilter, skillIdsForJob.SkillIdsForSpec, 2);
 		}
 		if (jobOption.HideSpec3) {
-			auto skillIdsForSpecRecord = skillIdsForJob.SkillIdsForSpec.find(3);
-			if (skillIdsForSpecRecord != skillIdsForJob.SkillIdsForSpec.end()) {
-				idsToFilter.insert_range(skillIdsForSpecRecord->second);
-			}
+			addIdsForSpec(idsToFilter, skillIdsForJob.SkillIdsForSpec, 3);
 		}
-		if (jobOption.IsHideAll()) {
-			idsToFilter.insert(skillIdsForJob.SharedSkillIds.begin(), skillIdsForJob.SharedSkillIds.end());
+		//remove the ids from the filter if not hide to not remove shared ids
+		if (!jobOption.HideSpec1)
+		{
+			removeIdsForSpec(idsToFilter, skillIdsForJob.SkillIdsForSpec, 1);
+		}
+		if (!jobOption.HideSpec2)
+		{
+			removeIdsForSpec(idsToFilter, skillIdsForJob.SkillIdsForSpec, 2);
+		}
+		if (!jobOption.HideSpec3)
+		{
+			removeIdsForSpec(idsToFilter, skillIdsForJob.SkillIdsForSpec, 3);
 		}
 	}
 	//remove bardTreeExclusionIds from idsToFilter if not hidetree
@@ -545,6 +565,24 @@ void SkillIdManager::ResetIdsToFilter() {
 	ResetEffectIdsToFilter();
 }
 
+static void addEffectIdsForSpec(std::unordered_set<unsigned __int64>& idsToFilter, std::unordered_map<int, std::unordered_set<unsigned __int64>>& effectIdsForSpec, int specIndex) {
+	auto effectIdsForSpecRecord = effectIdsForSpec.find(specIndex);
+	if (effectIdsForSpecRecord != effectIdsForSpec.end()) {
+		for (auto id : effectIdsForSpecRecord->second) {
+			idsToFilter.insert(id);
+		}
+	}
+}
+
+static void removeEffectIdsForSpec(std::unordered_set<unsigned __int64>& idsToFilter, std::unordered_map<int, std::unordered_set<unsigned __int64>>& effectIdsForSpec, int specIndex) {
+	auto effectIdsForSpecRecord = effectIdsForSpec.find(specIndex);
+	if (effectIdsForSpecRecord != effectIdsForSpec.end()) {
+		for (auto id : effectIdsForSpecRecord->second) {
+			idsToFilter.erase(id);
+		}
+	}
+}
+
 void SkillIdManager::ResetEffectIdsToFilter() {
 	effectIdsToFilter.clear();
 	if (!g_PluginConfig.IsLoaded() || !g_PluginConfig.HasActiveProfile())
@@ -559,23 +597,28 @@ void SkillIdManager::ResetEffectIdsToFilter() {
 		auto effectIdsForJobRecord = effectIdsForJobMap.find(jobId);
 		if (effectIdsForJobRecord == effectIdsForJobMap.end()) continue;
 		auto& effectIdsForJob = effectIdsForJobRecord->second;
+
 		if (jobOption.HideSpec1) {
-			auto effectIdsForSpecRecord = effectIdsForJob.EffectIdsForSpec.find(1);
-			if (effectIdsForSpecRecord != effectIdsForJob.EffectIdsForSpec.end()) {
-				effectIdsToFilter.insert_range(effectIdsForSpecRecord->second);
-			}
+			addEffectIdsForSpec(effectIdsToFilter, effectIdsForJob.EffectIdsForSpec, 1);
 		}
 		if (jobOption.HideSpec2) {
-			auto effectIdsForSpecRecord = effectIdsForJob.EffectIdsForSpec.find(2);
-			if (effectIdsForSpecRecord != effectIdsForJob.EffectIdsForSpec.end()) {
-				effectIdsToFilter.insert_range(effectIdsForSpecRecord->second);
-			}
+			addEffectIdsForSpec(effectIdsToFilter, effectIdsForJob.EffectIdsForSpec, 2);
 		}
 		if (jobOption.HideSpec3) {
-			auto effectIdsForSpecRecord = effectIdsForJob.EffectIdsForSpec.find(3);
-			if (effectIdsForSpecRecord != effectIdsForJob.EffectIdsForSpec.end()) {
-				effectIdsToFilter.insert_range(effectIdsForSpecRecord->second);
-			}
+			addEffectIdsForSpec(effectIdsToFilter, effectIdsForJob.EffectIdsForSpec, 3);
+		}
+
+		if (!jobOption.HideSpec1)
+		{
+			removeEffectIdsForSpec(effectIdsToFilter, effectIdsForJob.EffectIdsForSpec, 1);
+		}
+		if (!jobOption.HideSpec2)
+		{
+			removeEffectIdsForSpec(effectIdsToFilter, effectIdsForJob.EffectIdsForSpec, 2);
+		}
+		if (!jobOption.HideSpec3)
+		{
+			removeEffectIdsForSpec(effectIdsToFilter, effectIdsForJob.EffectIdsForSpec, 3);
 		}
 	}
 }

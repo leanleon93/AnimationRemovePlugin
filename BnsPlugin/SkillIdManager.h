@@ -11,7 +11,6 @@ class SkillIdManager {
 	struct SkillIdsForJob {
 		char JobId;
 		std::unordered_map<int, std::unordered_set<int>> SkillIdsForSpec;
-		std::unordered_set<int> SharedSkillIds;
 	};
 	struct EffectIdsForJob {
 		char JobId;
