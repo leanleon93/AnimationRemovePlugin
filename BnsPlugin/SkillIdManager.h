@@ -6,6 +6,8 @@
 #include "Data.h"
 #include "Records/SkillTrait/SkillTraitRecordBase.h"
 #include "Records/Effect/EffectRecordBase.h"
+#include <tuple>
+#include <vector>
 
 class SkillIdManager {
 	struct SkillIdsForJob {
@@ -24,6 +26,8 @@ public:
 	bool IsCriticalFail() const;
 	void ResetIdsToFilter();
 	const std::unordered_set<int>& GetIdsToFilter() const;
+	const std::unordered_set<int>& GetTaxiSkillIds() const;
+	const std::unordered_map<__int32, __int16>& GetTaxiExclusionIdVariations() const;
 	Data::DataManager* GetDataManager();
 	static struct SkillShow3KeyHelper {
 		static __int64 BuildKey(__int32 id_, __int16 variation_id_, __int16 skillskin_id_);
@@ -59,6 +63,19 @@ private:
 		242506,
 		242507
 	};
+
+	const std::unordered_set<int> defaultTaxiExclusionIds = {
+		141190,
+		142190,
+		143290
+	};
+
+	const std::unordered_map<__int32, __int16> taxiExclusionIdVariations = {
+		{ 141190, 9 },
+		{ 142190, 9 },
+		{ 143290, 5 }
+	};
+
 	const std::vector<std::string> skillNameExclusionList = {
 		"Cursed Cry",
 		"Cursed Surge",
@@ -86,6 +103,7 @@ private:
 	std::unordered_set<int> GetAllSkillIdsFromJobMap();
 	std::unordered_set<int> idsToFilter;
 	std::unordered_set<unsigned __int64> effectIdsToFilter;
+	std::unordered_set<int> taxiExclusionIds;
 	void ResetEffectIdsToFilter();
 	std::unordered_map<unsigned __int64, std::unordered_map<std::string, wchar_t>> effectRestoreList;
 	char GetJobIdForEnName(std::wstring const& enName);

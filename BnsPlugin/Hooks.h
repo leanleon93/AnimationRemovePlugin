@@ -1,8 +1,6 @@
 #pragma once
-#include <cstdint>
 #include "BSFunctions.h"
 #include "Data.h"
-#include "Records/Effect/EffectRecordBase.h"
 #include "Records/Skillshow3/SkillShow3Base.h"
 
 extern DrDataTable* (__fastcall* oData_DataManager_Effect)();

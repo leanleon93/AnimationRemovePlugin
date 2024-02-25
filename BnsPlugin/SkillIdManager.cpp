@@ -536,6 +536,12 @@ void SkillIdManager::ResetIdsToFilter() {
 			idsToFilter.erase(id);
 		}
 	}
+	if (activeProfile.HideTaxi) {
+		taxiExclusionIds = {};
+	}
+	else {
+		taxiExclusionIds = defaultTaxiExclusionIds;
+	}
 	ResetEffectIdsToFilter();
 }
 
@@ -722,4 +728,12 @@ void SkillIdManager::ReapplyEffectFilters() {
 
 bool SkillIdManager::IsCriticalFail() const {
 	return CriticalFail;
+}
+
+const std::unordered_map<__int32, __int16>& SkillIdManager::GetTaxiExclusionIdVariations() const {
+	return taxiExclusionIdVariations;
+}
+
+const std::unordered_set<int>& SkillIdManager::GetTaxiSkillIds() const {
+	return taxiExclusionIds;
 }

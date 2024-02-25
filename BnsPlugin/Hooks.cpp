@@ -1,7 +1,7 @@
 #include "BSFunctions.h"
 #include "Data.h"
 #include "DrEl.h"
-#include "Hooks.h";
+#include "Hooks.h"
 #include "PluginConfig.h"
 #include "Records/Skillshow3/SkillShow3Base.h"
 #include "SkillIdManager.h"
@@ -174,7 +174,13 @@ DrEl* __fastcall hkFind_b8(DrMultiKeyTable* thisptr, unsigned __int64 key) {
 	}
 	if (thisptr->_tabledef->type != g_SkillIdManager.GetSkillshowTableId()) return oFind_b8(thisptr, key);
 	const auto& ids = g_SkillIdManager.GetIdsToFilter();
-	if (const auto skillId = static_cast<int32_t>(key); !ids.contains(skillId)) return oFind_b8(thisptr, key);
+	const auto skillId = static_cast<int32_t>(key);
+	if (!ids.contains(skillId)) return oFind_b8(thisptr, key);
+	if (const auto& taxiIds = g_SkillIdManager.GetTaxiSkillIds(); taxiIds.contains(skillId)) {
+		const auto& taxiIdVariations = g_SkillIdManager.GetTaxiExclusionIdVariations();
+		const auto skillshowKey = SkillIdManager::SkillShow3KeyHelper::ExtractKey(key);
+		if (taxiIdVariations.at(skillId) == skillshowKey.variation_id) return oFind_b8(thisptr, key);
+	}
 	auto recordBase = oFind_b8(thisptr, key);
 	if (recordBase == nullptr) return oFind_b8(thisptr, key);
 	auto record = (Data::Skillshow3Record*)recordBase;
