@@ -9,11 +9,11 @@
 
 class SkillIdManager {
 	struct SkillIdsForJob {
-		char JobId;
+		char JobId = -1;
 		std::unordered_map<int, std::unordered_set<int>> SkillIdsForSpec;
 	};
 	struct EffectIdsForJob {
-		char JobId;
+		char JobId = -1;
 		std::unordered_map<int, std::unordered_set<unsigned __int64>> EffectIdsForSpec;
 	};
 public:
