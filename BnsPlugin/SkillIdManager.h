@@ -6,8 +6,6 @@
 #include "Data.h"
 #include "Records/SkillTrait/SkillTraitRecordBase.h"
 #include "Records/Effect/EffectRecordBase.h"
-#include <tuple>
-#include <vector>
 
 class SkillIdManager {
 	struct SkillIdsForJob {
