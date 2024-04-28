@@ -77,6 +77,9 @@ static void SetProfiles(pugi::xml_document const& doc, AnimFilterConfig* animFil
 			if (extraoptionsNode.attribute("hideTree") != nullptr) {
 				profile.HideTree = extraoptionsNode.attribute("hideTree").as_bool();
 			}
+			if (extraoptionsNode.attribute("hideTD") != nullptr) {
+				profile.HideTimeDistortion = extraoptionsNode.attribute("hideTD").as_bool();
+			}
 			if (extraoptionsNode.attribute("hideTaxi") != nullptr) {
 				profile.HideTaxi = extraoptionsNode.attribute("hideTaxi").as_bool();
 			}

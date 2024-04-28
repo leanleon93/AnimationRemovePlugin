@@ -556,6 +556,11 @@ void SkillIdManager::ResetIdsToFilter() {
 			idsToFilter.erase(id);
 		}
 	}
+	if (!activeProfile.HideTimeDistortion) {
+		for (auto id : wlTDExclusionIds) {
+			idsToFilter.erase(id);
+		}
+	}
 	if (activeProfile.HideTaxi) {
 		taxiExclusionIds = {};
 	}

@@ -61,6 +61,11 @@ private:
 		242507
 	};
 
+	const std::unordered_set<int> wlTDExclusionIds = {
+		171200,
+		173000
+	};
+
 	const std::unordered_set<int> defaultTaxiExclusionIds = {
 		141190,
 		142190,

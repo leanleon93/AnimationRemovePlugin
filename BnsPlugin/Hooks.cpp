@@ -9,7 +9,9 @@
 #include <format>
 #include <string>
 #include <unordered_map>
-
+#ifdef _DEBUG
+#include <iostream>
+#endif
 DrDataTable* (__fastcall* oData_DataManager_Effect)();
 
 template <typename Callable>
@@ -175,6 +177,11 @@ DrEl* __fastcall hkFind_b8(DrMultiKeyTable* thisptr, unsigned __int64 key) {
 	if (thisptr->_tabledef->type != g_SkillIdManager.GetSkillshowTableId()) return oFind_b8(thisptr, key);
 	const auto& ids = g_SkillIdManager.GetIdsToFilter();
 	const auto skillId = static_cast<int32_t>(key);
+#ifdef _DEBUG
+	//print the skill id and variation id from record_d
+	auto skillshowKey_d = SkillIdManager::SkillShow3KeyHelper::ExtractKey(key);
+	std::wcout << std::format(L"Skill Id: {}, Variation Id: {}\n", skillshowKey_d.id, skillshowKey_d.variation_id);
+#endif //_DEBUG
 	if (!ids.contains(skillId)) return oFind_b8(thisptr, key);
 	if (const auto& taxiIds = g_SkillIdManager.GetTaxiSkillIds(); taxiIds.contains(skillId)) {
 		const auto& taxiIdVariations = g_SkillIdManager.GetTaxiExclusionIdVariations();
