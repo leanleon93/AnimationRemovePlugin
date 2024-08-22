@@ -21,21 +21,21 @@
             <effect_options>
             </effect_options>
             <skill_options>
-                <option name="Blade Master" hideAllSpecs="true" />
-                <option name="Kung Fu Master" hideAllSpecs="true" />
-                <option name="Force Master" hideAllSpecs="true" />
-                <option name="Destroyer" hideAllSpecs="true" />
-                <option name="Assassin" hideAllSpecs="true" />
-                <option name="Summoner" hideAllSpecs="true" />
-                <option name="Blade Dancer" hideAllSpecs="true" />
-                <option name="Warlock" hideAllSpecs="true" />
-                <option name="Soul Fighter" hideAllSpecs="true" />
+                <option name="Blade Master" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
+                <option name="Kung Fu Master" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
+                <option name="Force Master" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
+                <option name="Destroyer" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
+                <option name="Assassin" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
+                <option name="Summoner" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
+                <option name="Blade Dancer" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
+                <option name="Warlock" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
+                <option name="Soul Fighter" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
                 <option name="Gunslinger" hideSpec1="false" hideSpec2="false" hideSpec3="false" />
-                <option name="Warden" hideAllSpecs="true" />
-                <option name="Zen Archer" hideAllSpecs="true" />
-                <option name="Astromancer" hideAllSpecs="true" />
-                <option name="Dual Blade" hideAllSpecs="true" />
-                <option name="Musician" hideAllSpecs="true" />
+                <option name="Warden" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
+                <option name="Zen Archer" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
+                <option name="Astromancer" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
+                <option name="Dual Blade" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
+                <option name="Musician" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
             </skill_options>
         </profile>
         <profile name="2">
