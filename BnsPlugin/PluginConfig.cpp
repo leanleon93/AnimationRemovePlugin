@@ -113,6 +113,14 @@ static void SetProfiles(pugi::xml_document const& doc, AnimFilterConfig* animFil
 			swapOption.AnimationSkillVariation = animationSkillVariation;
 			profile.AnimationSwaps[targetSkillId] = swapOption;
 		}
+		for (pugi::xml_node animSwapOptionNode : profileNode.child("effect_swap_options").children("option")) {
+			AnimFilterConfig::AnimFilterProfile::EffectSwapOption effectSwapOption{};
+			auto targetEffectId = animSwapOptionNode.attribute("targetEffectId").as_int();
+			effectSwapOption.TargetEffectId = targetEffectId;
+			auto animationEffectId = animSwapOptionNode.attribute("animationEffectId").as_int();
+			effectSwapOption.AnimationEffectId = animationEffectId;
+			profile.EffectSwaps[targetEffectId] = effectSwapOption;
+		}
 		for (pugi::xml_node skillOptionNode : profileNode.child("skill_options").children("option")) {
 			AnimFilterConfig::AnimFilterProfile::SkillOption skillOption;
 			auto name = skillOptionNode.attribute("name").as_string();
