@@ -360,6 +360,7 @@
     <ClCompile Include="PluginEntry.cpp" />
     <ClCompile Include="LeanPlugin.cpp" />
     <ClCompile Include="SkillIdManager.cpp" />
+    <ClCompile Include="SkillTraitJobstyleHelper.cpp" />
     <ClCompile Include="versioninfo.c" />
   </ItemGroup>
   <ItemGroup>
@@ -372,16 +373,18 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="LeanPlugin.h" />
     <ClInclude Include="PluginConfig.h" />
-    <ClInclude Include="Records\EffectGroup\EffectGroupBase.h" />
-    <ClInclude Include="Records\Effect\EffectRecordBase.h" />
-    <ClInclude Include="Records\Itemskill\ItemskillRecordBase.h" />
-    <ClInclude Include="Records\Job\JobRecordBase.h" />
-    <ClInclude Include="Records\Skill3\Skill3ActiveSkillRecord.h" />
-    <ClInclude Include="Records\Skill3\Skill3RecordBase.h" />
-    <ClInclude Include="Records\SkillInheritance\SkillInheritanceBase.h" />
-    <ClInclude Include="Records\Skillshow3\SkillShow3Base.h" />
-    <ClInclude Include="Records\SkillTrait\SkillTraitRecordBase.h" />
-    <ClInclude Include="Records\Text\TextRecordBase.h" />
+    <ClInclude Include="Records\EffectGroup\AAA_effect_group_RecordBase.h" />
+    <ClInclude Include="Records\Effect\AAA_effect_RecordBase.h" />
+    <ClInclude Include="Records\Itemskill\AAA_itemskill_RecordBase.h" />
+    <ClInclude Include="Records\Job\AAA_job_RecordBase.h" />
+    <ClInclude Include="Records\Skill3\AAA_skill3_RecordBase.h" />
+    <ClInclude Include="Records\Skill3\skill3_action_Record.h" />
+    <ClInclude Include="Records\Skill3\skill3_active_skill_Record.h" />
+    <ClInclude Include="Records\Skill3\skill3_passive_skill_Record.h" />
+    <ClInclude Include="Records\SkillInheritance\AAA_skill_inheritance_RecordBase.h" />
+    <ClInclude Include="Records\Skillshow3\AAA_skillshow3_RecordBase.h" />
+    <ClInclude Include="Records\SkillTrait\AAA_skill_trait_RecordBase.h" />
+    <ClInclude Include="Records\Text\AAA_text_RecordBase.h" />
     <ClInclude Include="SkillIdJson.h" />
     <ClInclude Include="SkillIdManager.h" />
     <ClInclude Include="versioninfo.h" />

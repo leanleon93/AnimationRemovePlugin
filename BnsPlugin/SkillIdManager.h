@@ -2,10 +2,10 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <string>
-#include "Records/Skillshow3/SkillShow3Base.h"
+#include "Records/Skillshow3/AAA_skillshow3_RecordBase.h"
 #include "Data.h"
-#include "Records/SkillTrait/SkillTraitRecordBase.h"
-#include "Records/Effect/EffectRecordBase.h"
+#include "Records/SkillTrait/AAA_skill_trait_RecordBase.h"
+#include "Records/Effect/AAA_effect_RecordBase.h"
 
 class SkillIdManager {
 	struct SkillIdsForJob {
@@ -28,7 +28,7 @@ public:
 	Data::DataManager* GetDataManager();
 	static struct SkillShow3KeyHelper {
 		static __int64 BuildKey(__int32 id_, __int16 variation_id_, __int16 skillskin_id_);
-		static Data::Skillshow3Record::Key ExtractKey(__int64 key);
+		static Data::skillshow3_Record::Key ExtractKey(__int64 key);
 		static __int32 ExtractId(__int64 key);
 	};
 	void SetDataManagerPtr(__int64 const* ptr);
@@ -115,9 +115,9 @@ private:
 	bool SetupSkillShowTableId();
 	bool SetupSkillIdsForJob(char jobId);
 	bool SetupEffectIdsForJob(char jobId);
-	void AddIds(Data::SkillTraitRecord const* record, int const* ids, int size, SkillIdsForJob& skillIdsForJobEntry);
-	void AddFixedIds(Data::SkillTraitRecord const* record, SkillIdsForJob& skillIdsForJobEntry);
-	void AddVariableIds(Data::SkillTraitRecord const* record, SkillIdsForJob& skillIdsForJobEntry);
+	void AddIds(Data::skill_trait_Record const* record, int const* ids, int size, SkillIdsForJob& skillIdsForJobEntry);
+	void AddFixedIds(Data::skill_trait_Record const* record, SkillIdsForJob& skillIdsForJobEntry);
+	void AddVariableIds(Data::skill_trait_Record const* record, SkillIdsForJob& skillIdsForJobEntry);
 	std::unordered_set<int> GetInheritedIds(int id);
 	void AddChildrenSkillIds(SkillIdsForJob& skillIdsForJobEntry);
 	std::unordered_set<int> GetChildSkillIds(int id);
@@ -128,8 +128,8 @@ private:
 	void RestoreEffects();
 	void RemoveEffects();
 	void SwapEffects();
-	void SwapAnimationsForEffect(Data::EffectRecord* target, Data::EffectRecord* animation);
-	void RemoveAnimationsForEffect(Data::EffectRecord* effectRecord);
+	void SwapAnimationsForEffect(Data::effect_Record* target, Data::effect_Record* animation);
+	void RemoveAnimationsForEffect(Data::effect_Record* effectRecord);
 	std::unordered_set<unsigned __int64> GetEffectIdsForEffectGroup(unsigned __int64 effectGroupId);
 	bool CompatabilityCheck();
 	const std::unordered_set<std::wstring> usedTables = {

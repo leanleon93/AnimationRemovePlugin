@@ -60,6 +60,9 @@
     <ClCompile Include="SkillIdManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SkillTraitJobstyleHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="versioninfo.h">
@@ -86,16 +89,7 @@
     <ClInclude Include="Data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Records\Effect\EffectRecordBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DrEl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Records\Skillshow3\SkillShow3Base.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Records\Job\JobRecordBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AnimFilterConfig.h">
@@ -107,25 +101,40 @@
     <ClInclude Include="SkillIdManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Records\Text\TextRecordBase.h">
+    <ClInclude Include="Records\Skill3\AAA_skill3_RecordBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Records\SkillTrait\SkillTraitRecordBase.h">
+    <ClInclude Include="Records\Skill3\skill3_action_Record.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Records\SkillInheritance\SkillInheritanceBase.h">
+    <ClInclude Include="Records\Skill3\skill3_active_skill_Record.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Records\Skill3\Skill3RecordBase.h">
+    <ClInclude Include="Records\Skill3\skill3_passive_skill_Record.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Records\Skill3\Skill3ActiveSkillRecord.h">
+    <ClInclude Include="Records\Effect\AAA_effect_RecordBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Records\Itemskill\ItemskillRecordBase.h">
+    <ClInclude Include="Records\EffectGroup\AAA_effect_group_RecordBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Records\EffectGroup\EffectGroupBase.h">
+    <ClInclude Include="Records\Itemskill\AAA_itemskill_RecordBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Records\Job\AAA_job_RecordBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Records\SkillInheritance\AAA_skill_inheritance_RecordBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Records\Skillshow3\AAA_skillshow3_RecordBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Records\SkillTrait\AAA_skill_trait_RecordBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Records\Text\AAA_text_RecordBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
