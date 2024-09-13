@@ -2,10 +2,10 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <string>
-#include "Records/Skillshow3/AAA_skillshow3_RecordBase.h"
+#include "BnsDatafileTables/skillshow3/AAA_skillshow3_RecordBase.h"
 #include "Data.h"
-#include "Records/SkillTrait/AAA_skill_trait_RecordBase.h"
-#include "Records/Effect/AAA_effect_RecordBase.h"
+#include "BnsDatafileTables/skill_trait/AAA_skill_trait_RecordBase.h"
+#include "BnsDatafileTables/effect/AAA_effect_RecordBase.h"
 
 class SkillIdManager {
 	struct SkillIdsForJob {

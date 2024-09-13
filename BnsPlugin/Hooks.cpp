@@ -3,7 +3,7 @@
 #include "DrEl.h"
 #include "Hooks.h"
 #include "PluginConfig.h"
-#include "Records/Skillshow3/AAA_skillshow3_RecordBase.h"
+#include "BnsDatafileTables/skillshow3/AAA_skillshow3_RecordBase.h"
 #include "SkillIdManager.h"
 #include <cstdint>
 #include <format>

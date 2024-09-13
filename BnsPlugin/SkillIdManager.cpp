@@ -1,17 +1,18 @@
 #include "SkillIdManager.h"
-#include "Records/Job/AAA_job_RecordBase.h"
-#include "Records/Text/AAA_text_RecordBase.h"
-#include "Records/SkillInheritance/AAA_skill_inheritance_RecordBase.h"
+#include "BnsDatafileTables/job/AAA_job_RecordBase.h"
+#include "BnsDatafileTables/text/AAA_text_RecordBase.h"
+#include "BnsDatafileTables/skill_inheritance/AAA_skill_inheritance_RecordBase.h"
 #include <algorithm>
-#include "Records/Skill3/AAA_skill3_RecordBase.h"
-#include "Records/Skill3/skill3_active_skill_Record.h"
-#include "Records/Itemskill/AAA_itemskill_RecordBase.h"
+#include "BnsDatafileTables/skill3/AAA_skill3_RecordBase.h"
+#include "BnsDatafileTables/skill3/skill3_active_skill_Record.h"
+#include "BnsDatafileTables/itemskill/AAA_itemskill_RecordBase.h"
 #include "PluginConfig.h"
 #include <Windows.h>
 #ifdef _DEBUG
 #include <iostream>
+#include <utility>
 #endif // _DEBUG
-#include "Records/EffectGroup/AAA_effect_group_RecordBase.h"
+#include "BnsDatafileTables/effect_group/AAA_effect_group_RecordBase.h"
 #include "SkillTraitJobstyleHelper.cpp"
 
 SkillIdManager g_SkillIdManager;
@@ -79,7 +80,7 @@ std::unordered_set<int> SkillIdManager::GetChildSkillIds(int id) {
 		if (!innerIter->_vtptr->IsValid(innerIter)) continue;
 		auto record = innerIter->_vtptr->Ptr(innerIter);
 		if (record == nullptr) continue;
-		if (record->subtype != (__int16)Data::skill3_RecordSubType::skill3_record_sub_active_skill) continue;
+		if (record->subtype != (__int16)std::to_underlying(Data::skill3_RecordSubType::skill3_record_sub_active_skill)) continue;
 		auto activeSkillRecord = (Data::skill3_active_skill_Record*)record;
 		if (activeSkillRecord->key.id != id) continue;
 		if (std::ranges::find(idExclusionList.begin(), idExclusionList.end(), activeSkillRecord->key.id) != idExclusionList.end()) continue;

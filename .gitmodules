@@ -16,3 +16,6 @@
 [submodule "Template/deps/wil"]
 	path = Template/deps/wil
 	url = https://github.com/microsoft/wil
+[submodule "BnsPlugin/deps/BnsDatafileTables"]
+	path = BnsPlugin/deps/BnsDatafileTables
+	url = https://github.com/leanleon93/BnsDatafileTables

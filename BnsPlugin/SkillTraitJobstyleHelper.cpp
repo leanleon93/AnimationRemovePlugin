@@ -1,4 +1,3 @@
-#include "Records/SkillTrait/AAA_skill_trait_RecordBase.h"
 namespace Data {
 	class SkillTraitJobStyleHelper {
 	public:
