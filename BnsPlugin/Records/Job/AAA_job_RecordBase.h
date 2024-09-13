@@ -40,7 +40,7 @@ wchar_t* lobby_job_symbol_image;
 __int64 introduce_job_style[3];
 __int64 play_style_desc;
 wchar_t* play_style_imageset;
-char play_difficulty;
+__int8 play_difficulty;
 char Pad2[3];
 __int64 play_difficulty_desc;
 wchar_t* hud_player_job_imageset;

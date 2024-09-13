@@ -15,8 +15,8 @@ namespace Data {
             struct {
                 __int8 job;
 __int8 job_style;
-char tier;
-char tier_variation;
+__int8 tier;
+__int8 tier_variation;
 
             };
 			unsigned __int64 key;
@@ -27,7 +27,7 @@ bool enable;
 char Pad0[3];
 __int32 fixed_skill3_id[64];
 __int32 variable_skill3_id[32];
-char variable_skill3_variation_id[32];
+__int8 variable_skill3_variation_id[32];
 __int64 name2;
 __int64 icon_texture;
 __int16 icon_index;
@@ -42,7 +42,7 @@ __int64 tooltip_skill_systematization_group[6];
 __int32 tooltip_acquire_skill_list_skill3_id[6];
 __int64 tooltip_acquire_skill_list_skill3_description[6];
 __int32 tooltip_variable_skill_list_skill3_id[6];
-char tooltip_variable_skill_list_skill3_variation_id[6];
+__int8 tooltip_variable_skill_list_skill3_variation_id[6];
 char Pad3[2];
 __int64 tooltip_variable_skill_list_skill3_description[6];
 

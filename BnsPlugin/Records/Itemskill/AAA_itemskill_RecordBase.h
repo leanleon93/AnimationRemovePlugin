@@ -20,7 +20,7 @@ namespace Data {
 		__declspec(align(8)) Key key;
 		wchar_t* alias;
 __int32 skill_id;
-char skill_variation_id[8];
+__int8 skill_variation_id[8];
 bool include_inheritance_skill;
 char Pad0[3];
 __int64 item_sim_skill;

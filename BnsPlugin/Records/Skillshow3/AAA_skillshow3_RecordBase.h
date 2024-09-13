@@ -14,7 +14,7 @@ namespace Data {
 		{
             struct {
                 __int32 id;
-char variation_id;
+__int8 variation_id;
 __int16 skillskin_id;
 
             };
@@ -39,7 +39,7 @@ wchar_t* player_stop_show;
 __int8 chain_type;
 __int8 create_phantom_type;
 __int8 phantom_shoot_type;
-char lyn_phantom_count;
+__int8 lyn_phantom_count;
 bool succession_next_skill;
 bool show_key_result_damage_signal;
 char Pad1[2];
