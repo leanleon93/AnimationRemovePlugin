@@ -108,6 +108,7 @@ private:
 	std::unordered_set<int> taxiExclusionIds;
 	void ResetEffectIdsToFilter();
 	std::unordered_map<unsigned __int64, std::unordered_map<std::string, wchar_t>> effectRestoreList;
+	std::unordered_map<unsigned __int64, std::unordered_map<std::string, wchar_t*>> effectSwapRestoreList;
 	char GetJobIdForEnName(std::wstring const& enName);
 	bool SetupJobNameMap();
 	bool SetupAllSkillIds();
@@ -126,6 +127,8 @@ private:
 	std::unordered_set<int> GetItemSkills(int id);
 	void RestoreEffects();
 	void RemoveEffects();
+	void SwapEffects();
+	void SwapAnimationsForEffect(Data::EffectRecord* target, Data::EffectRecord* animation);
 	void RemoveAnimationsForEffect(Data::EffectRecord* effectRecord);
 	std::unordered_set<unsigned __int64> GetEffectIdsForEffectGroup(unsigned __int64 effectGroupId);
 	bool CompatabilityCheck();

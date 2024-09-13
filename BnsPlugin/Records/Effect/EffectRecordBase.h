@@ -25,6 +25,8 @@ namespace Data {
 		wchar_t* buff_continuance_component;
 		wchar_t* immune_buff_component;
 		wchar_t* detach_show;
+		wchar_t* dispel_show;
+		bool play_detach_show_hide;
 	};
 #pragma pack(pop)
 #pragma pack(push, 1)

@@ -686,15 +686,45 @@ void SkillIdManager::RestoreEffects() {
 		if (kvp.contains(attribute)) effectRecord->immune_buff_component[0] = kvp[attribute];
 		attribute = "detach_show";
 		if (kvp.contains(attribute)) effectRecord->detach_show[0] = kvp[attribute];
+		attribute = "dispel_show";
+		if (kvp.contains(attribute)) effectRecord->dispel_show[0] = kvp[attribute];
 	}
+	for (auto& [key, kvp] : effectSwapRestoreList) {
+		auto record = table->__vftable->Find_b8(table, key);
+		if (record == nullptr) continue;
+		auto effectRecord = (Data::EffectRecord*)record;
+		std::string attribute = "normal_component";
+		if (kvp.contains(attribute)) effectRecord->normal_component = kvp[attribute];
+		attribute = "critical_component";
+		if (kvp.contains(attribute)) effectRecord->critical_component = kvp[attribute];
+		attribute = "back_normal_component";
+		if (kvp.contains(attribute)) effectRecord->back_normal_component = kvp[attribute];
+		attribute = "back_critical_component";
+		if (kvp.contains(attribute)) effectRecord->back_critical_component = kvp[attribute];
+		attribute = "buff_continuance_component";
+		if (kvp.contains(attribute)) effectRecord->buff_continuance_component = kvp[attribute];
+		attribute = "immune_buff_component";
+		if (kvp.contains(attribute)) effectRecord->immune_buff_component = kvp[attribute];
+		attribute = "detach_show";
+		if (kvp.contains(attribute)) effectRecord->detach_show = kvp[attribute];
+		attribute = "dispel_show";
+		if (kvp.contains(attribute)) effectRecord->dispel_show = kvp[attribute];
+	}
+
+	//Clear
 	for (auto& [key, kvp] : effectRestoreList) {
 		kvp.clear();
 	}
+	for (auto& [key, kvp] : effectSwapRestoreList) {
+		kvp.clear();
+	}
 	effectRestoreList.clear();
+	effectSwapRestoreList.clear();
 }
 
 void SkillIdManager::RemoveAnimationsForEffect(Data::EffectRecord* effectRecord) {
 	if (effectRestoreList.contains(effectRecord->key.key)) return;
+	if (effectSwapRestoreList.contains(effectRecord->key.key)) return;
 	std::string attribute = "normal_component";
 	if (effectRecord->normal_component != nullptr && effectRecord->normal_component[0] != L'\0') {
 		effectRestoreList[effectRecord->key.key][attribute] = effectRecord->normal_component[0];
@@ -730,6 +760,49 @@ void SkillIdManager::RemoveAnimationsForEffect(Data::EffectRecord* effectRecord)
 		effectRestoreList[effectRecord->key.key][attribute] = effectRecord->detach_show[0];
 		*effectRecord->detach_show = L'\0';
 	}
+	if (effectRecord->dispel_show != nullptr && effectRecord->dispel_show[0] != L'\0') {
+		attribute = "dispel_show";
+		effectRestoreList[effectRecord->key.key][attribute] = effectRecord->dispel_show[0];
+		*effectRecord->dispel_show = L'\0';
+	}
+}
+
+void SkillIdManager::SwapAnimationsForEffect(Data::EffectRecord* target, Data::EffectRecord* animation) {
+	if (effectSwapRestoreList.contains(target->key.key)) return;
+	for (auto [attribute, member1, member2] : {
+		std::tuple<std::string, wchar_t*&, wchar_t*&>("normal_component", target->normal_component, animation->normal_component),
+		std::tuple<std::string, wchar_t*&, wchar_t*&>("critical_component", target->critical_component, animation->critical_component),
+		std::tuple<std::string, wchar_t*&, wchar_t*&>("back_normal_component", target->back_normal_component, animation->back_normal_component),
+		std::tuple<std::string, wchar_t*&, wchar_t*&>("back_critical_component", target->back_critical_component, animation->back_critical_component),
+		std::tuple<std::string, wchar_t*&, wchar_t*&>("buff_continuance_component", target->buff_continuance_component, animation->buff_continuance_component),
+		std::tuple<std::string, wchar_t*&, wchar_t*&>("immune_buff_component", target->immune_buff_component, animation->immune_buff_component),
+		std::tuple<std::string, wchar_t*&, wchar_t*&>("detach_show", target->detach_show, animation->detach_show),
+		std::tuple<std::string, wchar_t*&, wchar_t*&>("dispel_show", target->dispel_show, animation->dispel_show),
+		}) {
+		effectSwapRestoreList[target->key.key][attribute] = member1;
+		member1 = member2;
+	}
+}
+
+void SkillIdManager::SwapEffects() {
+	if (this->dataManagerPtr == nullptr || *this->dataManagerPtr == NULL) {
+		return;
+	}
+	if (!g_PluginConfig.IsLoaded() || !g_PluginConfig.HasActiveProfile()) return;
+	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
+	if (!versionCheckSuccess.contains(L"effect") || !versionCheckSuccess[L"effect"]) {
+		return;
+	}
+	const auto table = DataHelper::GetTable(manager, L"effect");
+	if (table == nullptr) return;
+	for (auto& [effectKey, effectSwap] : g_PluginConfig.GetActiveProfile().EffectSwaps) {
+		auto animationKey = effectSwap.AnimationEffectId;
+		auto effectRecord = (Data::EffectRecord*)table->__vftable->Find_b8(table, effectKey);
+		if (effectRecord == nullptr) continue;
+		auto animationRecord = (Data::EffectRecord*)table->__vftable->Find_b8(table, animationKey);
+		if (animationRecord == nullptr) continue;
+		SwapAnimationsForEffect(effectRecord, animationRecord);
+	}
 }
 
 void SkillIdManager::RemoveEffects() {
@@ -743,8 +816,7 @@ void SkillIdManager::RemoveEffects() {
 	}
 	const auto table = DataHelper::GetTable(manager, L"effect");
 	if (table == nullptr) return;
-	auto& effectFilters = g_PluginConfig.GetActiveProfile().EffectFilters;
-	for (auto const& filter : effectFilters) {
+	for (auto& effectFilters = g_PluginConfig.GetActiveProfile().EffectFilters; auto const& filter : effectFilters) {
 		if (filter.IsAlias) continue; //TODO: add alias support
 		auto record = table->__vftable->Find_b8(table, filter.Key);
 		if (record == nullptr) continue;
@@ -771,6 +843,7 @@ std::unordered_set<int> SkillIdManager::GetAllSkillIdsFromJobMap() {
 
 void SkillIdManager::ReapplyEffectFilters() {
 	RestoreEffects();
+	SwapEffects();
 	RemoveEffects();
 }
 
