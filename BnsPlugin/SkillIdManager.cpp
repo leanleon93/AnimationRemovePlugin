@@ -14,6 +14,7 @@
 #endif // _DEBUG
 #include "BnsDatafileTables/effect_group/AAA_effect_group_RecordBase.h"
 #include "SkillTraitJobstyleHelper.cpp"
+#include "BnsDatafileTables/BnsTableNames.h"
 
 SkillIdManager g_SkillIdManager;
 
@@ -85,7 +86,7 @@ std::unordered_set<int> SkillIdManager::GetChildSkillIds(int id) {
 		if (activeSkillRecord->key.id != id) continue;
 		if (std::ranges::find(idExclusionList.begin(), idExclusionList.end(), activeSkillRecord->key.id) != idExclusionList.end()) continue;
 		for (auto key : activeSkillRecord->children_skill) {
-			if (key == 0) continue;
+			if (key.Key == 0) continue;
 			auto idPtr = reinterpret_cast<__int32*>(&key);
 			auto childSkillId = *idPtr;
 			if (std::ranges::find(idExclusionList.begin(), idExclusionList.end(), childSkillId) != idExclusionList.end()) continue;
@@ -198,7 +199,7 @@ std::unordered_set<int> SkillIdManager::GetItemSkills(int id) {
 		auto record = (Data::itemskill_Record*)innerIter->_vtptr->Ptr(innerIter);
 		if (record == nullptr) continue;
 		if (record->skill_id != id) continue;
-		auto itemSimSkillId = static_cast<__int32>(record->item_sim_skill);
+		auto itemSimSkillId = static_cast<__int32>(record->item_sim_skill.Key);
 		if (itemSimSkillId == 0) continue;
 		itemSkills.insert(itemSimSkillId);
 	} while (innerIter->_vtptr->Next(innerIter));
@@ -256,8 +257,8 @@ std::unordered_set<unsigned __int64> SkillIdManager::GetEffectIdsForEffectGroup(
 	auto effectGroupRecord = (Data::effect_group_Record*)record;
 	std::unordered_set<unsigned __int64> effectIds;
 	for (auto effectId : effectGroupRecord->effect) {
-		if (effectId == 0) continue;
-		effectIds.insert(effectId);
+		if (effectId.Key == 0) continue;
+		effectIds.insert(effectId.Key);
 	}
 	return effectIds;
 }
@@ -295,8 +296,8 @@ bool SkillIdManager::SetupEffectIdsForJob(char jobId) {
 				if (record->subtype != (__int16)Data::skill3_RecordSubType::skill3_record_sub_active_skill) continue;
 				bool breakOuter = false;
 				for (auto const& systematization : record->systematization) {
-					if (systematization == 0) continue;
-					if (systematization == 30) {
+					if (systematization.Key == 0) continue;
+					if (systematization.Key == 30) {
 						breakOuter = true;
 						break;
 					}
@@ -304,78 +305,78 @@ bool SkillIdManager::SetupEffectIdsForJob(char jobId) {
 				if (breakOuter) continue;
 				auto activeSkillRecord = (Data::skill3_active_skill_Record*)record;
 				for (auto passiveEffect : activeSkillRecord->passive_effect) {
-					if (passiveEffect == 0) continue;
-					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(passiveEffect);
+					if (passiveEffect.Key == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(passiveEffect.Key);
 				}
 				for (auto castEffect : activeSkillRecord->cast_effect) {
-					if (castEffect == 0) continue;
-					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(castEffect);
+					if (castEffect.Key == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(castEffect.Key);
 				}
 
 				for (auto swing_caster_effect : activeSkillRecord->swing_caster_effect_1) {
-					if (swing_caster_effect == 0) continue;
-					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(swing_caster_effect);
+					if (swing_caster_effect.Key == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(swing_caster_effect.Key);
 				}
 				for (auto swing_caster_effect : activeSkillRecord->swing_caster_effect_2) {
-					if (swing_caster_effect == 0) continue;
-					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(swing_caster_effect);
+					if (swing_caster_effect.Key == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(swing_caster_effect.Key);
 				}
 				for (auto swing_caster_effect : activeSkillRecord->swing_caster_effect_3) {
-					if (swing_caster_effect == 0) continue;
-					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(swing_caster_effect);
+					if (swing_caster_effect.Key == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(swing_caster_effect.Key);
 				}
 				for (auto swing_caster_effect : activeSkillRecord->swing_caster_effect_4) {
-					if (swing_caster_effect == 0) continue;
-					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(swing_caster_effect);
+					if (swing_caster_effect.Key == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(swing_caster_effect.Key);
 				}
 				for (auto swing_caster_effect : activeSkillRecord->swing_caster_effect_5) {
-					if (swing_caster_effect == 0) continue;
-					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(swing_caster_effect);
+					if (swing_caster_effect.Key == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(swing_caster_effect.Key);
 				}
 
 				for (auto execCasterEffect : activeSkillRecord->exec_caster_effect_1) {
-					if (execCasterEffect == 0) continue;
-					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execCasterEffect);
+					if (execCasterEffect.Key == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execCasterEffect.Key);
 				}
 				for (auto execCasterEffect : activeSkillRecord->exec_caster_effect_2) {
-					if (execCasterEffect == 0) continue;
-					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execCasterEffect);
+					if (execCasterEffect.Key == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execCasterEffect.Key);
 				}
 				for (auto execCasterEffect : activeSkillRecord->exec_caster_effect_3) {
-					if (execCasterEffect == 0) continue;
-					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execCasterEffect);
+					if (execCasterEffect.Key == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execCasterEffect.Key);
 				}
 				for (auto execCasterEffect : activeSkillRecord->exec_caster_effect_4) {
-					if (execCasterEffect == 0) continue;
-					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execCasterEffect);
+					if (execCasterEffect.Key == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execCasterEffect.Key);
 				}
 				for (auto execCasterEffect : activeSkillRecord->exec_caster_effect_5) {
-					if (execCasterEffect == 0) continue;
-					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execCasterEffect);
+					if (execCasterEffect.Key == 0) continue;
+					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(execCasterEffect.Key);
 				}
 				for (auto execEffectGroupId : activeSkillRecord->exec_effect_1) {
-					if (execEffectGroupId == 0) continue;
-					auto effectIds = GetEffectIdsForEffectGroup(execEffectGroupId);
+					if (execEffectGroupId.Key == 0) continue;
+					auto effectIds = GetEffectIdsForEffectGroup(execEffectGroupId.Key);
 					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(effectIds.begin(), effectIds.end());
 				}
 				for (auto execEffectGroupId : activeSkillRecord->exec_effect_2) {
-					if (execEffectGroupId == 0) continue;
-					auto effectIds = GetEffectIdsForEffectGroup(execEffectGroupId);
+					if (execEffectGroupId.Key == 0) continue;
+					auto effectIds = GetEffectIdsForEffectGroup(execEffectGroupId.Key);
 					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(effectIds.begin(), effectIds.end());
 				}
 				for (auto execEffectGroupId : activeSkillRecord->exec_effect_3) {
-					if (execEffectGroupId == 0) continue;
-					auto effectIds = GetEffectIdsForEffectGroup(execEffectGroupId);
+					if (execEffectGroupId.Key == 0) continue;
+					auto effectIds = GetEffectIdsForEffectGroup(execEffectGroupId.Key);
 					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(effectIds.begin(), effectIds.end());
 				}
 				for (auto execEffectGroupId : activeSkillRecord->exec_effect_4) {
-					if (execEffectGroupId == 0) continue;
-					auto effectIds = GetEffectIdsForEffectGroup(execEffectGroupId);
+					if (execEffectGroupId.Key == 0) continue;
+					auto effectIds = GetEffectIdsForEffectGroup(execEffectGroupId.Key);
 					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(effectIds.begin(), effectIds.end());
 				}
 				for (auto execEffectGroupId : activeSkillRecord->exec_effect_5) {
-					if (execEffectGroupId == 0) continue;
-					auto effectIds = GetEffectIdsForEffectGroup(execEffectGroupId);
+					if (execEffectGroupId.Key == 0) continue;
+					auto effectIds = GetEffectIdsForEffectGroup(execEffectGroupId.Key);
 					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(effectIds.begin(), effectIds.end());
 				}
 			} while (innerIter->_vtptr->Next(innerIter));
@@ -421,7 +422,7 @@ bool SkillIdManager::SetupJobNameMap() {
 		auto record = (Data::job_Record*)innerIter->_vtptr->Ptr(innerIter);
 		if (record == nullptr) continue;
 		jobIds.insert(record->key.job);
-		auto enJobName = (Data::text_Record*)textTable->__vftable->Find_b8(textTable, record->name2);
+		auto enJobName = (Data::text_Record*)textTable->__vftable->Find_b8(textTable, record->name2.Key);
 		jobNameMap[enJobName->text.ReadableText] = record->key.job;
 #ifdef _DEBUG
 		std::wcout << "{ L\"" << enJobName->text.ReadableText << "\", " << +record->key.job << " }," << std::endl;
@@ -460,11 +461,8 @@ bool SkillIdManager::CompatabilityCheck() {
 		printf("\tAddress of %s is %p\n", "type", &tableDef->type);
 		std::cout << std::endl;
 #endif // _DEBUG
-		auto confirmedVersion = confirmedMajorMinorVersions.find(tableName);
-		if (confirmedVersion == confirmedMajorMinorVersions.end()) {
-			continue;
-		}
-		if (tableDef->version.ver == confirmedVersion->second) {
+		auto confirmedVersion = Data::TableNames::GetTableVersion(Data::TableNames::GetTableId(tableName));
+		if (tableDef->version.ver == confirmedVersion.Version.VersionKey) {
 			versionCheckSuccess[tableName] = true;
 		}
 	}

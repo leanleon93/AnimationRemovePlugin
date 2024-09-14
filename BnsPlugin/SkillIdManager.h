@@ -143,17 +143,6 @@ private:
 		L"effect-group"
 	};
 
-	const std::unordered_map<std::wstring, __int32> confirmedMajorMinorVersions = {
-		{ L"skillshow3", 655362 },
-		{ L"effect", 34 },
-		{ L"job", 3997696 },
-		{ L"skill3", 65546 },
-		{ L"skill-trait", 720896 },
-		{ L"itemskill", 851968 },
-		{ L"skill-inheritance", 262144 },
-		{ L"effect-group", 458752 }
-	};
-
 	std::unordered_map<std::wstring, bool> versionCheckSuccess = {
 		{ L"skillshow3", false },
 		{ L"effect", false },
