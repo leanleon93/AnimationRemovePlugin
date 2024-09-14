@@ -89,9 +89,6 @@
     <ClInclude Include="Data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DrEl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="AnimFilterConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>

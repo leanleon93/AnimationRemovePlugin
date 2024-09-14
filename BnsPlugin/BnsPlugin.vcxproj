@@ -367,7 +367,6 @@
     <ClInclude Include="AnimFilterConfig.h" />
     <ClInclude Include="BSFunctions.h" />
     <ClInclude Include="Data.h" />
-    <ClInclude Include="DrEl.h" />
     <ClInclude Include="Hooks.h" />
     <ClInclude Include="patternbyte.h" />
     <ClInclude Include="pch.h" />

@@ -1,6 +1,6 @@
 #include "BSFunctions.h"
 #include "Data.h"
-#include "DrEl.h"
+#include "BnsDatafileTables/DrEl.h"
 #include "Hooks.h"
 #include "PluginConfig.h"
 #include "BnsDatafileTables/skillshow3/AAA_skillshow3_RecordBase.h"
