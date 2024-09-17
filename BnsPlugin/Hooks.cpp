@@ -1,9 +1,9 @@
 #include "BSFunctions.h"
 #include "Data.h"
-#include "BnsDatafileTables/DrEl.h"
+#include "DrEl.h"
 #include "Hooks.h"
 #include "PluginConfig.h"
-#include "BnsDatafileTables/skillshow3/AAA_skillshow3_RecordBase.h"
+#include "skillshow3/AAA_skillshow3_RecordBase.h"
 #include "SkillIdManager.h"
 #include <cstdint>
 #include <format>

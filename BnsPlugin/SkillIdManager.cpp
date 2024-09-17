@@ -1,20 +1,20 @@
 #include "SkillIdManager.h"
-#include "BnsDatafileTables/job/AAA_job_RecordBase.h"
-#include "BnsDatafileTables/text/AAA_text_RecordBase.h"
-#include "BnsDatafileTables/skill_inheritance/AAA_skill_inheritance_RecordBase.h"
+#include "job/AAA_job_RecordBase.h"
+#include "text/AAA_text_RecordBase.h"
+#include "skill_inheritance/AAA_skill_inheritance_RecordBase.h"
 #include <algorithm>
-#include "BnsDatafileTables/skill3/AAA_skill3_RecordBase.h"
-#include "BnsDatafileTables/skill3/skill3_active_skill_Record.h"
-#include "BnsDatafileTables/itemskill/AAA_itemskill_RecordBase.h"
+#include "skill3/AAA_skill3_RecordBase.h"
+#include "skill3/skill3_active_skill_Record.h"
+#include "itemskill/AAA_itemskill_RecordBase.h"
 #include "PluginConfig.h"
 #include <Windows.h>
 #ifdef _DEBUG
 #include <iostream>
 #include <utility>
 #endif // _DEBUG
-#include "BnsDatafileTables/effect_group/AAA_effect_group_RecordBase.h"
+#include "effect_group/AAA_effect_group_RecordBase.h"
 #include "SkillTraitJobstyleHelper.cpp"
-#include "BnsDatafileTables/BnsTableNames.h"
+#include "BnsTableNames.h"
 
 SkillIdManager g_SkillIdManager;
 

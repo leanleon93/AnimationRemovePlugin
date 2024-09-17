@@ -1,5 +1,5 @@
 #pragma once
-#include "BnsDatafileTables/DrEl.h"
+#include "DrEl.h"
 #include <map>
 
 struct DataChunk

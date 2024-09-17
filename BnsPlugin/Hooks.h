@@ -1,7 +1,7 @@
 #pragma once
 #include "BSFunctions.h"
 #include "Data.h"
-#include "BnsDatafileTables/skillshow3/AAA_skillshow3_RecordBase.h"
+#include "skillshow3/AAA_skillshow3_RecordBase.h"
 
 extern DrDataTable* (__fastcall* oData_DataManager_Effect)();
 

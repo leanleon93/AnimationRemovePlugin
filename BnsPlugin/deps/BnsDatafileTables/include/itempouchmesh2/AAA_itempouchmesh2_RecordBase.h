@@ -1,0 +1,89 @@
+/*
+ Generated Code! Do not manually edit this code. Modify the generator instead.
+*/
+#pragma once
+#include "../DrEl.h"
+#include "../AnyToStringConverter.h"
+
+namespace Data {
+
+#pragma pack(push, 1)
+	struct itempouchmesh2_Record : DrEl
+	{
+	private:
+		static std::wstring Get_pouch_appearance_EnumValue(__int8 value);
+		static std::wstring Get_npc_grade2_EnumValue(__int8 value);
+	public:
+		std::any GetField(const wchar_t* fieldName) const {
+			if (wcscmp(fieldName, L"skeletal_mesh") == 0) return skeletal_mesh;
+			if (wcscmp(fieldName, L"anim_set") == 0) return anim_set;
+			if (wcscmp(fieldName, L"physics_asset") == 0) return physics_asset;
+			if (wcscmp(fieldName, L"custom_anim") == 0) return custom_anim;
+			if (wcscmp(fieldName, L"despawn_showdata") == 0) return despawn_showdata;
+			if (wcscmp(fieldName, L"icon") == 0) return icon;
+			if (wcscmp(fieldName, L"owner_particle") == 0) return owner_particle;
+			if (wcscmp(fieldName, L"mark_particle") == 0) return mark_particle;
+			if (wcscmp(fieldName, L"dropped_pouch_anim_set") == 0) return dropped_pouch_anim_set;
+
+			return std::any();
+		}
+		std::wstring GetFieldAsString(const wchar_t* fieldName) {
+			if (wcscmp(fieldName, L"skeletal_mesh") == 0) return Data::AnyFieldToStringConverter::ToString(&skeletal_mesh);
+			if (wcscmp(fieldName, L"anim_set") == 0) return Data::AnyFieldToStringConverter::ToString(&anim_set);
+			if (wcscmp(fieldName, L"physics_asset") == 0) return Data::AnyFieldToStringConverter::ToString(&physics_asset);
+			if (wcscmp(fieldName, L"custom_anim") == 0) return Data::AnyFieldToStringConverter::ToString(&custom_anim);
+			if (wcscmp(fieldName, L"despawn_showdata") == 0) return Data::AnyFieldToStringConverter::ToString(&despawn_showdata);
+			if (wcscmp(fieldName, L"icon") == 0) return Data::AnyFieldToStringConverter::ToString(&icon);
+			if (wcscmp(fieldName, L"owner_particle") == 0) return Data::AnyFieldToStringConverter::ToString(&owner_particle);
+			if (wcscmp(fieldName, L"mark_particle") == 0) return Data::AnyFieldToStringConverter::ToString(&mark_particle);
+			if (wcscmp(fieldName, L"dropped_pouch_anim_set") == 0) return Data::AnyFieldToStringConverter::ToString(&dropped_pouch_anim_set);
+
+			return L"";
+		}
+		void AutoCorrectLookupOffsets(const char* lookupDataPtr) {
+			if (reinterpret_cast<std::uintptr_t>(skeletal_mesh) < reinterpret_cast<std::uintptr_t>(lookupDataPtr)) skeletal_mesh = reinterpret_cast<wchar_t*>(const_cast<char*>(lookupDataPtr) + reinterpret_cast<std::uintptr_t>(skeletal_mesh));
+			else return;
+			if (reinterpret_cast<std::uintptr_t>(anim_set) < reinterpret_cast<std::uintptr_t>(lookupDataPtr)) anim_set = reinterpret_cast<wchar_t*>(const_cast<char*>(lookupDataPtr) + reinterpret_cast<std::uintptr_t>(anim_set));
+			if (reinterpret_cast<std::uintptr_t>(physics_asset) < reinterpret_cast<std::uintptr_t>(lookupDataPtr)) physics_asset = reinterpret_cast<wchar_t*>(const_cast<char*>(lookupDataPtr) + reinterpret_cast<std::uintptr_t>(physics_asset));
+			if (reinterpret_cast<std::uintptr_t>(custom_anim) < reinterpret_cast<std::uintptr_t>(lookupDataPtr)) custom_anim = reinterpret_cast<wchar_t*>(const_cast<char*>(lookupDataPtr) + reinterpret_cast<std::uintptr_t>(custom_anim));
+			if (reinterpret_cast<std::uintptr_t>(despawn_showdata) < reinterpret_cast<std::uintptr_t>(lookupDataPtr)) despawn_showdata = reinterpret_cast<wchar_t*>(const_cast<char*>(lookupDataPtr) + reinterpret_cast<std::uintptr_t>(despawn_showdata));
+			if (reinterpret_cast<std::uintptr_t>(owner_particle) < reinterpret_cast<std::uintptr_t>(lookupDataPtr)) owner_particle = reinterpret_cast<wchar_t*>(const_cast<char*>(lookupDataPtr) + reinterpret_cast<std::uintptr_t>(owner_particle));
+			if (reinterpret_cast<std::uintptr_t>(mark_particle) < reinterpret_cast<std::uintptr_t>(lookupDataPtr)) mark_particle = reinterpret_cast<wchar_t*>(const_cast<char*>(lookupDataPtr) + reinterpret_cast<std::uintptr_t>(mark_particle));
+			if (reinterpret_cast<std::uintptr_t>(dropped_pouch_anim_set) < reinterpret_cast<std::uintptr_t>(lookupDataPtr)) dropped_pouch_anim_set = reinterpret_cast<wchar_t*>(const_cast<char*>(lookupDataPtr) + reinterpret_cast<std::uintptr_t>(dropped_pouch_anim_set));
+		}
+		union Key
+		{
+            struct {
+                __int8 pouch_appearance;
+__int8 npc_grade2;
+bool private_pouch;
+
+            };
+			unsigned __int64 key;
+		};
+		__declspec(align(8)) Key key;
+		wchar_t* skeletal_mesh;
+wchar_t* anim_set;
+wchar_t* physics_asset;
+wchar_t* custom_anim;
+wchar_t* despawn_showdata;
+Data::IconRef icon;
+wchar_t* owner_particle;
+wchar_t* mark_particle;
+wchar_t* dropped_pouch_anim_set;
+
+		static TableVersion Version() { return TableVersion(0, 5); }
+		static __int16 TableId() { return 203; }
+		static __int32 SubType() { return 0; }
+	};
+#pragma pack(pop)
+#pragma pack(push, 1)
+	struct __declspec(align(4)) itempouchmesh2_RecordPtr // : DrRecordPtr
+	{
+		itempouchmesh2_Record* _record;
+		int _cacheChunkIndex;
+		//__unaligned __declspec(align(1)) const Data::itempouchmesh2_Record* _debug;
+		bool _makeCopy;
+	};
+#pragma pack(pop)
+}

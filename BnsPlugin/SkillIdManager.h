@@ -2,10 +2,10 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <string>
-#include "BnsDatafileTables/skillshow3/AAA_skillshow3_RecordBase.h"
+#include "skillshow3/AAA_skillshow3_RecordBase.h"
 #include "Data.h"
-#include "BnsDatafileTables/skill_trait/AAA_skill_trait_RecordBase.h"
-#include "BnsDatafileTables/effect/AAA_effect_RecordBase.h"
+#include "skill_trait/AAA_skill_trait_RecordBase.h"
+#include "effect/AAA_effect_RecordBase.h"
 
 class SkillIdManager {
 	struct SkillIdsForJob {
@@ -26,7 +26,7 @@ public:
 	const std::unordered_set<int>& GetTaxiSkillIds() const;
 	const std::unordered_map<__int32, __int16>& GetTaxiExclusionIdVariations() const;
 	Data::DataManager* GetDataManager();
-	static struct SkillShow3KeyHelper {
+	struct SkillShow3KeyHelper {
 		static __int64 BuildKey(__int32 id_, __int16 variation_id_, __int16 skillskin_id_);
 		static Data::skillshow3_Record::Key ExtractKey(__int64 key);
 		static __int32 ExtractId(__int64 key);
