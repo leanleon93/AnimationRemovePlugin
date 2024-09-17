@@ -249,7 +249,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>TRIALDLL_EXPORT;_CRT_SECURE_NO_WARNINGS;UNICODE;_UNICODE;_DEBUG;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)vcpkg_installed\x64-windows\include;$(ProjectDir)deps;$(ProjectDir)deps\BnsDatafileTables\include;$(ProjectDir)deps\Detours</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)vcpkg_installed\x64-windows\include;$(ProjectDir)deps;$(ProjectDir)deps\BnsPluginTables\Generated\include;$(ProjectDir)deps\Detours</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Disabled</Optimization>
@@ -265,7 +265,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
-      <AdditionalDependencies>ntdll.lib;BnsDatafileTables.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ntdll.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
       <OptimizeReferences>
@@ -274,7 +274,7 @@
       <LinkTimeCodeGeneration>
       </LinkTimeCodeGeneration>
       <SetChecksum>false</SetChecksum>
-      <AdditionalLibraryDirectories>$(ProjectDir)deps\BnsDatafileTables\bin\x64\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug161|x64'">
@@ -283,7 +283,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>TRIALDLL_EXPORT;_CRT_SECURE_NO_WARNINGS;UNICODE;_UNICODE;_DEBUG;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)vcpkg_installed\x64-windows\include;$(ProjectDir)deps;$(ProjectDir)deps\BnsDatafileTables\include;$(ProjectDir)deps\Detours</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)vcpkg_installed\x64-windows\include;$(ProjectDir)deps;$(ProjectDir)deps\BnsPluginTables\Generated\include;$(ProjectDir)deps\Detours</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Disabled</Optimization>
@@ -299,7 +299,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
-      <AdditionalDependencies>ntdll.lib;BnsDatafileTables.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ntdll.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
       <OptimizeReferences>
@@ -308,7 +308,7 @@
       <LinkTimeCodeGeneration>
       </LinkTimeCodeGeneration>
       <SetChecksum>false</SetChecksum>
-      <AdditionalLibraryDirectories>$(ProjectDir)deps\BnsDatafileTables\bin\x64\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -319,7 +319,7 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;NOMINMAX;_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;_UNICODE;_WINDOWS;JM_XORSTR_DISABLE_AVX_INTRINSICS;PHNT_VERSION=PHNT_THRESHOLD;RESULT_DIAGNOSTICS_LEVEL=0;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)vcpkg_installed\x64-windows\include;$(ProjectDir)deps;$(ProjectDir)deps\BnsDatafileTables\include;$(ProjectDir)deps\Detours</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)vcpkg_installed\x64-windows\include;$(ProjectDir)deps;$(ProjectDir)deps\BnsPluginTables\Generated\include;$(ProjectDir)deps\Detours</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -338,14 +338,14 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>ntdll.lib;BnsDatafileTables.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <SetChecksum>true</SetChecksum>
       <ImageHasSafeExceptionHandlers>
       </ImageHasSafeExceptionHandlers>
-      <AdditionalLibraryDirectories>$(ProjectDir)deps\BnsDatafileTables\bin\x64\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
