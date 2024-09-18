@@ -3,7 +3,7 @@
 #include "DrEl.h"
 #include "Hooks.h"
 #include "PluginConfig.h"
-#include "skillshow3/AAA_skillshow3_RecordBase.h"
+#include "EU/skillshow3/AAA_skillshow3_RecordBase.h"
 #include "SkillIdManager.h"
 #include <cstdint>
 #include <format>
@@ -71,7 +71,7 @@ static void ReloadSkillShow3OnHotkeyPress() {
 			//cycle the cache
 			do {
 				if (!it->_vtptr->IsValid(it)) continue;
-				if (auto record = (Data::skillshow3_Record*)it->_vtptr->Ptr(it); record == nullptr) continue;
+				if (auto record = (BnsTables::EU::skillshow3_Record*)it->_vtptr->Ptr(it); record == nullptr) continue;
 			} while (it->_vtptr->Next(it));
 			reloadRequired = false;
 		}
@@ -127,7 +127,7 @@ bool __fastcall hkBInputKey(BInputKey* thisptr, EInputKeyEvent* InputKeyEvent) {
 	return oBInputKey(thisptr, InputKeyEvent);
 }
 
-void RemoveAnimationsForRecord(Data::skillshow3_Record* record)
+void RemoveAnimationsForRecord(BnsTables::EU::skillshow3_Record* record)
 {
 	auto setToNull = [](wchar_t* member) {
 		*member = L'\0';
@@ -169,8 +169,8 @@ void RemoveAnimationsForRecord(Data::skillshow3_Record* record)
 	}
 }
 
-DrEl* (__fastcall* oFind_b8)(DrMultiKeyTable* thisptr, unsigned __int64 key);
-DrEl* __fastcall hkFind_b8(DrMultiKeyTable* thisptr, unsigned __int64 key) {
+BnsTables::Shared::DrEl* (__fastcall* oFind_b8)(DrMultiKeyTable* thisptr, unsigned __int64 key);
+BnsTables::Shared::DrEl* __fastcall hkFind_b8(DrMultiKeyTable* thisptr, unsigned __int64 key) {
 	if (!g_PluginConfig.AnimFilterEnabled() || !g_PluginConfig.IsLoaded() || !g_PluginConfig.HasActiveProfile()) {
 		return oFind_b8(thisptr, key);
 	}
@@ -190,7 +190,7 @@ DrEl* __fastcall hkFind_b8(DrMultiKeyTable* thisptr, unsigned __int64 key) {
 	}
 	auto recordBase = oFind_b8(thisptr, key);
 	if (recordBase == nullptr) return oFind_b8(thisptr, key);
-	auto record = (Data::skillshow3_Record*)recordBase;
+	auto record = (BnsTables::EU::skillshow3_Record*)recordBase;
 	RemoveAnimationsForRecord(record);
 	reloadRequired = true;
 	return recordBase;

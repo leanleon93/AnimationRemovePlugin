@@ -49,7 +49,7 @@ const DrTableDef* DataHelper::GetTableDef(const Data::DataManager* dataManager, 
 	return nullptr;
 }
 
-DrEl* DataHelper::GetRecord(const Data::DataManager* dataManager, int tableId, __int64 key)
+BnsTables::Shared::DrEl* DataHelper::GetRecord(const Data::DataManager* dataManager, int tableId, __int64 key)
 {
 	if (dataManager == nullptr) {
 		return nullptr;

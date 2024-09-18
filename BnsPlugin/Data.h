@@ -12,7 +12,7 @@ struct DataChunk
 	unsigned __int8* rawData;
 	unsigned int elCount;
 	unsigned __int16* elArray;
-	DrEl* elPtrArray;
+	BnsTables::Shared::DrEl* elPtrArray;
 	unsigned int refCount;
 	DataChunk* nextChunk;
 	DataChunk* prevChunk;
@@ -43,7 +43,7 @@ struct DrElIter;
 struct DrInnerIter;
 struct DrInnerIter_vtbl
 {
-	DrEl* (__fastcall* Ptr)(DrInnerIter* thisptr);
+	BnsTables::Shared::DrEl* (__fastcall* Ptr)(DrInnerIter* thisptr);
 	bool(__fastcall* Next)(DrInnerIter* thisptr);
 	bool(__fastcall* IsValid)(DrInnerIter* thisptr);
 };
@@ -62,10 +62,10 @@ struct DrDataTable;
 struct /*VFT*/ DrDataTable_vtbl
 {
 	char padding[0xB0];
-	DrEl* (__fastcall* Find)(DrDataTable* thisptr, const wchar_t*, const DrAliasMap*);
-	DrEl* (__fastcall* Find_b8)(DrDataTable* thisptr, unsigned __int64);
+	BnsTables::Shared::DrEl* (__fastcall* Find)(DrDataTable* thisptr, const wchar_t*, const DrAliasMap*);
+	BnsTables::Shared::DrEl* (__fastcall* Find_b8)(DrDataTable* thisptr, unsigned __int64);
 	void(__fastcall* SetUseLowMemory)(DrDataTable* thisptr, bool);
-	DrInnerIter* (__fastcall* createInnerIter)(DrDataTable* thisptr, DrEl* const);
+	DrInnerIter* (__fastcall* createInnerIter)(DrDataTable* thisptr, BnsTables::Shared::DrEl* const);
 	DrInnerIter* (__fastcall* createInnerIter_d0)(DrDataTable* thisptr);
 	void(__fastcall* removeInnerIter)(DrDataTable* thisptr, DrInnerIter*);
 };
@@ -90,8 +90,8 @@ struct DrMultiKeyElMap_vtbl {
 	char padding[0x08];
 	void(__fastcall* clearLink)(DrMultiKeyElMap* thisptr);
 	void(__fastcall* construct)(DrMultiKeyElMap* thisptr, unsigned __int64);
-	DrEl* (__fastcall* set)(DrMultiKeyElMap* thisptr, unsigned __int64, DrEl*, const bool);
-	DrEl* (__fastcall* get)(DrMultiKeyElMap* thisptr, unsigned __int64);
+	BnsTables::Shared::DrEl* (__fastcall* set)(DrMultiKeyElMap* thisptr, unsigned __int64, BnsTables::Shared::DrEl*, const bool);
+	BnsTables::Shared::DrEl* (__fastcall* get)(DrMultiKeyElMap* thisptr, unsigned __int64);
 	int(__fastcall* count)(DrMultiKeyElMap* thisptr);
 };
 
@@ -138,7 +138,7 @@ struct DrLoaderDef {
 	const wchar_t* xml;
 	bool subdir;
 	__declspec(align(4)) const wchar_t* xsd;
-	bool(__fastcall* postproc)(DrEl*);
+	bool(__fastcall* postproc)(BnsTables::Shared::DrEl*);
 	char xmldoc[0x0C];
 	char l10ndoc[0x0C];
 	bool loaded;
@@ -166,5 +166,5 @@ public:
 	static DrDataTable* GetTable(const Data::DataManager* dataManager, const wchar_t* tableName);
 	static __int16 GetTableId(const Data::DataManager* dataManager, const wchar_t* tableName);
 	static const DrTableDef* GetTableDef(const Data::DataManager* dataManager, const wchar_t* tableName);
-	static DrEl* GetRecord(const Data::DataManager* dataManager, int tableId, __int64 key);
+	static BnsTables::Shared::DrEl* GetRecord(const Data::DataManager* dataManager, int tableId, __int64 key);
 };

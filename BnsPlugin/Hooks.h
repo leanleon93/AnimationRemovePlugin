@@ -1,7 +1,7 @@
 #pragma once
 #include "BSFunctions.h"
 #include "Data.h"
-#include "skillshow3/AAA_skillshow3_RecordBase.h"
+#include "EU/skillshow3/AAA_skillshow3_RecordBase.h"
 
 extern DrDataTable* (__fastcall* oData_DataManager_Effect)();
 
@@ -10,6 +10,6 @@ void EffectTableTest();
 static void SkillShow3TableTest();
 bool __fastcall hkBInputKey(BInputKey* thisptr, EInputKeyEvent* InputKeyEvent);
 
-void RemoveAnimationsForRecord(Data::skillshow3_Record* record);
-extern DrEl* (__fastcall* oFind_b8)(DrMultiKeyTable* thisptr, unsigned __int64 key);
-DrEl* __fastcall hkFind_b8(DrMultiKeyTable* thisptr, unsigned __int64 key);
+void RemoveAnimationsForRecord(BnsTables::EU::skillshow3_Record* record);
+extern BnsTables::Shared::DrEl* (__fastcall* oFind_b8)(DrMultiKeyTable* thisptr, unsigned __int64 key);
+BnsTables::Shared::DrEl* __fastcall hkFind_b8(DrMultiKeyTable* thisptr, unsigned __int64 key);
