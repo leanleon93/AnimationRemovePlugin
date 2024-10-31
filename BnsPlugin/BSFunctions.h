@@ -3,15 +3,6 @@
 #include <cstddef>
 #include <string>
 
-class BInputKey {
-public:
-	int Key;
-	bool bCtrlPressed;
-	bool bShiftPressed;
-	bool bAltPressed;
-	bool bDoubleClicked;
-	bool bTpsModeKey;
-};
 
 enum class EngineKeyStateType {
 	EKS_PRESSED = 0,
@@ -23,9 +14,21 @@ enum class EngineKeyStateType {
 
 std::string EngineKeyStateString(EngineKeyStateType type);
 
-class EInputKeyEvent {
-public:
-	char padding[0x18];
+struct EngineEvent;
+
+struct EngineEventVtbl
+{
+	void* (__fastcall* __vecDelDtor)(EngineEvent* This, unsigned int);
+	int(__fastcall* Id)(EngineEvent* This);
+};
+
+struct EngineEvent {
+	EngineEventVtbl* vfptr;
+	EngineEvent* _next;
+	__int64 _etime;
+};
+
+struct EInputKeyEvent : EngineEvent {
 	char _vKey;
 	char padd_2[0x2];
 	EngineKeyStateType KeyState;

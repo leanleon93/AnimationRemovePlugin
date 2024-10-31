@@ -77,18 +77,18 @@ static void ReloadSkillShow3OnHotkeyPress() {
 		}
 	}
 }
-extern BSMessaging* Messaging;
+//extern BSMessaging* Messaging;
 
 static void ReloadConfigOnHotkeyPress() {
 	g_PluginConfig.ReloadFromConfig();
 	g_SkillIdManager.ResetIdsToFilter();
 	g_SkillIdManager.ReapplyEffectFilters();
 	ReloadSkillShow3OnHotkeyPress();
-	auto message = LR"(AnimFilter Config Reloaded)";
+	/*auto message = LR"(AnimFilter Config Reloaded)";
 	Messaging->DisplaySystemChatMessage(message, false);
 	if (g_PluginConfig.AnimFilterEnabled() && g_PluginConfig.GetActiveProfile().Text != L"") {
 		Messaging->DisplaySystemChatMessage(g_PluginConfig.GetActiveProfile().Text.c_str(), false);
-	}
+	}*/
 }
 
 static void SetProfileOnHotkeyPress(int profileId) {
@@ -97,34 +97,38 @@ static void SetProfileOnHotkeyPress(int profileId) {
 	g_SkillIdManager.ReapplyEffectFilters();
 	ReloadSkillShow3OnHotkeyPress();
 	if (!g_PluginConfig.AnimFilterEnabled()) return;
-	std::wstring message = std::format(LR"(AnimFilter Using Profile {})", profileId);
+	/*std::wstring message = std::format(LR"(AnimFilter Using Profile {})", profileId);
 	Messaging->DisplaySystemChatMessage(message.c_str(), false);
 	if (g_PluginConfig.GetActiveProfile().Text != L"") {
 		Messaging->DisplaySystemChatMessage(g_PluginConfig.GetActiveProfile().Text.c_str(), false);
-	}
+	}*/
 }
 
-bool(__fastcall* oBInputKey)(BInputKey* thisptr, EInputKeyEvent* InputKeyEvent);
-bool __fastcall hkBInputKey(BInputKey* thisptr, EInputKeyEvent* InputKeyEvent) {
-	if (!g_PluginConfig.IsLoaded()) return oBInputKey(thisptr, InputKeyEvent);
-	auto& animFilterConfig = g_PluginConfig.GetAnimFilterConfig();
-	handleKeyEventWithModifiers(InputKeyEvent, animFilterConfig.ReloadKey.KeyCode, animFilterConfig.ReloadKey.Alt, animFilterConfig.ReloadKey.Shift, animFilterConfig.ReloadKey.Ctrl, ReloadConfigOnHotkeyPress);
-	handleKeyEventWithModifiers(InputKeyEvent, animFilterConfig.Profile1.KeyCode, animFilterConfig.Profile1.Alt, animFilterConfig.Profile1.Shift, animFilterConfig.Profile1.Ctrl, []() {
-		SetProfileOnHotkeyPress(1);
-		});
-	handleKeyEventWithModifiers(InputKeyEvent, animFilterConfig.Profile2.KeyCode, animFilterConfig.Profile2.Alt, animFilterConfig.Profile2.Shift, animFilterConfig.Profile2.Ctrl, []() {
-		SetProfileOnHotkeyPress(2);
-		});
-	handleKeyEventWithModifiers(InputKeyEvent, animFilterConfig.Profile3.KeyCode, animFilterConfig.Profile3.Alt, animFilterConfig.Profile3.Shift, animFilterConfig.Profile3.Ctrl, []() {
-		SetProfileOnHotkeyPress(3);
-		});
-	handleKeyEventWithModifiers(InputKeyEvent, animFilterConfig.Profile4.KeyCode, animFilterConfig.Profile4.Alt, animFilterConfig.Profile4.Shift, animFilterConfig.Profile4.Ctrl, []() {
-		SetProfileOnHotkeyPress(4);
-		});
-	handleKeyEventWithModifiers(InputKeyEvent, animFilterConfig.Profile5.KeyCode, animFilterConfig.Profile5.Alt, animFilterConfig.Profile5.Shift, animFilterConfig.Profile5.Ctrl, []() {
-		SetProfileOnHotkeyPress(5);
-		});
-	return oBInputKey(thisptr, InputKeyEvent);
+bool(__fastcall* oBUIWorld_ProcessEvent)(uintptr_t* This, EInputKeyEvent* InputKeyEvent);
+bool __fastcall hkBUIWorld_ProcessEvent(uintptr_t* This, EInputKeyEvent* InputKeyEvent) {
+	if (!InputKeyEvent)
+		return false;
+	if (!g_PluginConfig.IsLoaded()) return oBUIWorld_ProcessEvent(This, InputKeyEvent);
+	if (InputKeyEvent->vfptr->Id(InputKeyEvent) == 2) {
+		auto& animFilterConfig = g_PluginConfig.GetAnimFilterConfig();
+		handleKeyEventWithModifiers(InputKeyEvent, animFilterConfig.ReloadKey.KeyCode, animFilterConfig.ReloadKey.Alt, animFilterConfig.ReloadKey.Shift, animFilterConfig.ReloadKey.Ctrl, ReloadConfigOnHotkeyPress);
+		handleKeyEventWithModifiers(InputKeyEvent, animFilterConfig.Profile1.KeyCode, animFilterConfig.Profile1.Alt, animFilterConfig.Profile1.Shift, animFilterConfig.Profile1.Ctrl, []() {
+			SetProfileOnHotkeyPress(1);
+			});
+		handleKeyEventWithModifiers(InputKeyEvent, animFilterConfig.Profile2.KeyCode, animFilterConfig.Profile2.Alt, animFilterConfig.Profile2.Shift, animFilterConfig.Profile2.Ctrl, []() {
+			SetProfileOnHotkeyPress(2);
+			});
+		handleKeyEventWithModifiers(InputKeyEvent, animFilterConfig.Profile3.KeyCode, animFilterConfig.Profile3.Alt, animFilterConfig.Profile3.Shift, animFilterConfig.Profile3.Ctrl, []() {
+			SetProfileOnHotkeyPress(3);
+			});
+		handleKeyEventWithModifiers(InputKeyEvent, animFilterConfig.Profile4.KeyCode, animFilterConfig.Profile4.Alt, animFilterConfig.Profile4.Shift, animFilterConfig.Profile4.Ctrl, []() {
+			SetProfileOnHotkeyPress(4);
+			});
+		handleKeyEventWithModifiers(InputKeyEvent, animFilterConfig.Profile5.KeyCode, animFilterConfig.Profile5.Alt, animFilterConfig.Profile5.Shift, animFilterConfig.Profile5.Ctrl, []() {
+			SetProfileOnHotkeyPress(5);
+			});
+	}
+	return oBUIWorld_ProcessEvent(This, InputKeyEvent);
 }
 
 void RemoveAnimationsForRecord(BnsTables::EU::skillshow3_Record* record)

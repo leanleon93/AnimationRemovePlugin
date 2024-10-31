@@ -135,7 +135,7 @@ static __int64* WINAPI InitDetours() {
 	DetourTransactionBegin();
 	DetourUpdateThread(NtCurrentThread());
 
-	//HookFunction(xorstr_("0F B6 47 18 48 8D 4C 24 30 89 03"), -0x38, oBInputKey, &hkBInputKey, "aBinput");
+	HookFunction(xorstr_("48 85 D2 0F 84 ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B F8 48 85 C0 0F 84 ?? ?? ?? ?? 4C 8B 03"), -0x15, oBUIWorld_ProcessEvent, &hkBUIWorld_ProcessEvent, "aBUIWorld_ProcessEvent");
 	auto pattern = xorstr_("0F B6 C0 85 C0 75 07 32 C0 E9 67 07 00 00 E8 ?? ?? ?? ?? 48 ?? ?? ?? ?? 00 00 00 48 ?? ?? ?? ?? 00 00 00 48 8B 00 48 8B ?? ?? ?? ?? 00 00 48 8B ?? ?? ?? ?? 00 00 FF 90 B8 00 00 00 48 8B D0 48 ?? ?? ?? ??");
 	auto dataManagerPtr = HookDataManager(pattern, 0xF);
 	HookFunction(xorstr_("80 79 12 00 ?? ?? 48 8B 49 14 E9 ?? ?? ?? ?? 48 8B 41 24 48 83 C1 24 48 FF 60 18"), 0x00, oFind_b8, hkFind_b8, "Find_b8");
