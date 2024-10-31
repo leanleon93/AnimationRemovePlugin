@@ -464,6 +464,13 @@ bool SkillIdManager::CompatabilityCheck() {
 		std::cout << std::endl;
 #endif // _DEBUG
 		auto confirmedVersion = EU::TableNames::GetTableVersion(EU::TableNames::GetTableId(tableName));
+#ifdef _DEBUG
+		std::wcout << "Confirmed version for " << tableName << " is " << confirmedVersion.Version.VersionKey << std::endl;
+		std::wcout << "Confirmed major version for " << tableName << " is " << confirmedVersion.Version.MajorVersion << std::endl;
+		std::wcout << "Confirmed minor version for " << tableName << " is " << confirmedVersion.Version.MinorVersion << std::endl;
+		std::cout << std::endl;
+#endif // _DEBUG
+
 		if (tableDef->version.ver == confirmedVersion.Version.VersionKey) {
 			versionCheckSuccess[tableName] = true;
 		}
