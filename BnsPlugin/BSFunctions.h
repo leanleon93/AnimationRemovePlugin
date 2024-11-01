@@ -62,16 +62,16 @@ typedef void(__cdecl* _AddInstantNotification)(
 	char category,
 	const wchar_t* sound2);
 
-typedef void(__cdecl* _ExecuteConsoleCommandNoHistory)(const wchar_t* szCmd);
+typedef void* (__cdecl* _BNSClient_GetWorld)();
 
 #ifndef BSMessaging_H
 #define BSMessaging_H
 
 class BSMessaging {
 private:
-	uintptr_t* BNSClientInstance;
-	_AddInstantNotification oAddInstantNotification;
-	void SendGameMessage_s(
+	static void SendGameMessage_s(
+		uintptr_t* BNSClientInstance,
+		_AddInstantNotification* oAddInstantNotification,
 		const wchar_t* text,
 		const wchar_t* particleRef,
 		const wchar_t* sound,
@@ -83,9 +83,8 @@ private:
 		char category,
 		const wchar_t* sound2);
 public:
-	BSMessaging(uintptr_t*, _AddInstantNotification);
-	void DisplaySystemChatMessage(const wchar_t*, bool playSound);
-	void DisplayScrollingTextHeadline(const wchar_t*, bool playSound);
+	static void DisplaySystemChatMessage(uintptr_t*, _AddInstantNotification*, const wchar_t*, bool playSound);
+	static void DisplayScrollingTextHeadline(uintptr_t*, _AddInstantNotification*, const wchar_t*, bool playSound);
 };
 #endif // !BSMessaging_H
 

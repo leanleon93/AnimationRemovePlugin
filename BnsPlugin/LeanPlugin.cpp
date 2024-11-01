@@ -144,10 +144,8 @@ static __int64* WINAPI InitDetours() {
 	return dataManagerPtr;
 }
 
-static uintptr_t* BNSClientInstance = nullptr;
-static _AddInstantNotification oAddInstantNotification;
-static _ExecuteConsoleCommandNoHistory oExecuteConsoleCommandNoHistory;
-BSMessaging* Messaging;
+uintptr_t* BNSClientInstancePtr;
+_AddInstantNotification oAddInstantNotification;
 
 /// <summary>
 /// Setup BnS messaging to send chat or notification messages in game.
@@ -160,11 +158,14 @@ static void WINAPI InitMessaging() {
 #endif // _DEBUG
 
 #ifdef _DEBUG
-	std::cout << "Searching sBShowHud" << std::endl;
+	std::cout << "Searching BnsClientInstancePtr" << std::endl;
 #endif // _DEBUG
 
-	if (auto sBShowHud = std::search(data.begin(), data.end(), pattern_searcher(xorstr_("0F 29 70 C8 ?? 8B F2 48 8B ?? 48 83 79 08 00"))); sBShowHud != data.end()) {
-		BNSClientInstance = (uintptr_t*)GetAddress((uintptr_t)&sBShowHud[0] + 0x15, 3, 7);
+	if (auto result = std::search(data.begin(), data.end(), pattern_searcher(xorstr_("48 8B 05 ?? ?? ?? ?? 48 85 C0 74 ?? 48 8B 80 ?? ?? ?? ?? C3 C3 CC CC CC CC CC CC CC CC CC CC CC 48 8B 05"))); result != data.end()) {
+		auto getWorldAddress = (uintptr_t)&result[0];
+		auto bnsclientInstanceOffset = *reinterpret_cast<int*>(getWorldAddress + 3);
+		auto bnsclientInstanceAddress = getWorldAddress + bnsclientInstanceOffset + 7;
+		BNSClientInstancePtr = reinterpret_cast<uintptr_t*>(bnsclientInstanceAddress);
 	}
 
 #ifdef _DEBUG
@@ -186,13 +187,10 @@ static void WINAPI InitMessaging() {
 #ifdef _DEBUG
 	std::cout << "Searching Done" << std::endl;
 #endif // _DEBUG
-	Messaging = new BSMessaging(BNSClientInstance, oAddInstantNotification);
-#ifdef _DEBUG
-	std::cout << "Messaging object created" << std::endl;
-#endif // _DEBUG
 
 #ifdef _DEBUG
-	printf("Address of BNSInstance is %p\n", (void*)BNSClientInstance);
+	printf("Address of BNSInstance is %p\n", (void*)BNSClientInstancePtr);
+	printf("Address of AddInstantNotification is %p\n", (void*)oAddInstantNotification);
 	std::cout << std::endl;
 #endif // _DEBUG
 }
@@ -210,7 +208,7 @@ static void WINAPI LeanPlugin_Init()
 {
 	InitConfigValues();
 	ScannerSetup();
-	//InitMessaging();
+	InitMessaging();
 	const auto dataManagerPtr = InitDetours();
 	g_SkillIdManager.SetDataManagerPtr(dataManagerPtr);
 	if (dataManagerPtr != nullptr) {

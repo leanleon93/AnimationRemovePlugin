@@ -77,18 +77,20 @@ static void ReloadSkillShow3OnHotkeyPress() {
 		}
 	}
 }
-//extern BSMessaging* Messaging;
+
+extern uintptr_t* BNSClientInstancePtr;
+extern _AddInstantNotification oAddInstantNotification;
 
 static void ReloadConfigOnHotkeyPress() {
 	g_PluginConfig.ReloadFromConfig();
 	g_SkillIdManager.ResetIdsToFilter();
 	g_SkillIdManager.ReapplyEffectFilters();
 	ReloadSkillShow3OnHotkeyPress();
-	/*auto message = LR"(AnimFilter Config Reloaded)";
-	Messaging->DisplaySystemChatMessage(message, false);
+	auto message = LR"(AnimFilter Config Reloaded)";
+	BSMessaging::DisplaySystemChatMessage(BNSClientInstancePtr, &oAddInstantNotification, message, false);
 	if (g_PluginConfig.AnimFilterEnabled() && g_PluginConfig.GetActiveProfile().Text != L"") {
-		Messaging->DisplaySystemChatMessage(g_PluginConfig.GetActiveProfile().Text.c_str(), false);
-	}*/
+		BSMessaging::DisplaySystemChatMessage(BNSClientInstancePtr, &oAddInstantNotification, g_PluginConfig.GetActiveProfile().Text.c_str(), false);
+	}
 }
 
 static void SetProfileOnHotkeyPress(int profileId) {
@@ -97,11 +99,11 @@ static void SetProfileOnHotkeyPress(int profileId) {
 	g_SkillIdManager.ReapplyEffectFilters();
 	ReloadSkillShow3OnHotkeyPress();
 	if (!g_PluginConfig.AnimFilterEnabled()) return;
-	/*std::wstring message = std::format(LR"(AnimFilter Using Profile {})", profileId);
-	Messaging->DisplaySystemChatMessage(message.c_str(), false);
+	std::wstring message = std::format(LR"(AnimFilter Using Profile {})", profileId);
+	BSMessaging::DisplaySystemChatMessage(BNSClientInstancePtr, &oAddInstantNotification, message.c_str(), false);
 	if (g_PluginConfig.GetActiveProfile().Text != L"") {
-		Messaging->DisplaySystemChatMessage(g_PluginConfig.GetActiveProfile().Text.c_str(), false);
-	}*/
+		BSMessaging::DisplaySystemChatMessage(BNSClientInstancePtr, &oAddInstantNotification, g_PluginConfig.GetActiveProfile().Text.c_str(), false);
+	}
 }
 
 bool(__fastcall* oBUIWorld_ProcessEvent)(uintptr_t* This, EInputKeyEvent* InputKeyEvent);
