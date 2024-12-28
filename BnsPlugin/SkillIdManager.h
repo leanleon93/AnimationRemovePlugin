@@ -78,11 +78,6 @@ private:
 		{ 143290, 5 }
 	};
 
-	const std::vector<std::string> skillNameExclusionList = {
-		"Cursed Cry",
-		"Cursed Surge",
-		"Cursed Strike"
-	};
 	const std::unordered_map<char, EffectIdsForJob> fixedTargetEffectIds = {
 		{ 6, { 6, {
 			{ 1, { 26130068} },
@@ -100,6 +95,7 @@ private:
 	};
 	std::unordered_set<char> jobIds;
 	std::unordered_map<std::wstring, char> jobNameMap;
+	std::unordered_set<int> globalItemSkillIds;
 	std::unordered_map<char, SkillIdsForJob> skillIdsForJobMap;
 	std::unordered_map<char, EffectIdsForJob> effectIdsForJobMap;
 	std::unordered_set<int> GetAllSkillIdsFromJobMap();

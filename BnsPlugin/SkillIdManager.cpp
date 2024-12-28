@@ -147,46 +147,6 @@ static bool containsSubstring(const wchar_t* str, const wchar_t* substr) {
 	return s.find(sub) != std::wstring::npos;
 }
 
-bool SkillIdManager::IsBraceletId(int id) {
-	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
-	if (!versionCheckSuccess.contains(L"skill3") || !versionCheckSuccess[L"skill3"]) {
-		return false;
-	}
-	const auto table = DataHelper::GetTable(manager, L"skill3");
-	if (table == nullptr) return {};
-	auto innerIter = table->__vftable->createInnerIter_d0(table);
-	do {
-		if (!innerIter->_vtptr->IsValid(innerIter)) continue;
-		auto record = (EU::skill3_Record*)innerIter->_vtptr->Ptr(innerIter);
-		if (record == nullptr) continue;
-		if (record->key.id != id) continue;
-		if (containsSubstring(record->alias, L"bracelet")) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	} while (innerIter->_vtptr->Next(innerIter));
-	table->__vftable->removeInnerIter(table, innerIter);
-	return false;
-}
-
-void SkillIdManager::FilterBracelet(SkillIdsForJob& skillIdsForJobEntry) {
-	std::unordered_set<int> braceletIds;
-	for (auto const& [specIndex, skillIds] : skillIdsForJobEntry.SkillIdsForSpec) {
-		for (auto id : skillIds) {
-			if (IsBraceletId(id)) {
-				braceletIds.insert(id);
-			}
-		}
-	}
-	for (auto id : braceletIds) {
-		skillIdsForJobEntry.SkillIdsForSpec[1].erase(id);
-		skillIdsForJobEntry.SkillIdsForSpec[2].erase(id);
-		skillIdsForJobEntry.SkillIdsForSpec[3].erase(id);
-	}
-}
-
 std::unordered_set<int> SkillIdManager::GetItemSkills(int id) {
 	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
 	if (!versionCheckSuccess.contains(L"itemskill") || !versionCheckSuccess[L"itemskill"]) {
@@ -213,6 +173,7 @@ void SkillIdManager::AddItemSkills(SkillIdsForJob& skillIdsForJobEntry) {
 	for (auto const& [specIndex, skillIds] : skillIdsForJobEntry.SkillIdsForSpec) {
 		for (auto id : skillIds) {
 			auto itemSkills = GetItemSkills(id);
+			globalItemSkillIds.insert(itemSkills.begin(), itemSkills.end());
 			skillIdsForJobEntry.SkillIdsForSpec[specIndex].insert(itemSkills.begin(), itemSkills.end());
 		}
 	}
@@ -241,7 +202,6 @@ bool SkillIdManager::SetupSkillIdsForJob(char jobId) {
 	} while (innerIter->_vtptr->Next(innerIter));
 	AddChildrenSkillIds(skillIdsForJobEntry);
 	AddItemSkills(skillIdsForJobEntry);
-	FilterBracelet(skillIdsForJobEntry);
 	skillIdsForJobMap[jobId] = skillIdsForJobEntry;
 	table->__vftable->removeInnerIter(table, innerIter);
 	return true;
@@ -391,6 +351,7 @@ bool SkillIdManager::SetupEffectIdsForJob(char jobId) {
 
 bool SkillIdManager::SetupAllSkillIds() {
 	skillIdsForJobMap.clear();
+	globalItemSkillIds.clear();
 	if (this->dataManagerPtr == nullptr || *this->dataManagerPtr == NULL) {
 		return false;
 	}
@@ -559,6 +520,12 @@ void SkillIdManager::ResetIdsToFilter() {
 			removeIdsForSpec(idsToFilter, skillIdsForJob.SkillIdsForSpec, 3);
 		}
 	}
+
+	//remove all itemskills if set to hide global
+	if (activeProfile.HideGlobalItemSkills) {
+		idsToFilter.insert(globalItemSkillIds.begin(), globalItemSkillIds.end());
+	}
+
 	//remove bardTreeExclusionIds from idsToFilter if not hidetree
 	if (!activeProfile.HideTree) {
 		for (auto id : bardTreeExclusionIds) {

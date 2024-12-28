@@ -85,6 +85,9 @@ static void SetProfiles(pugi::xml_document const& doc, AnimFilterConfig* animFil
 			if (extraoptionsNode.attribute("hideTaxi") != nullptr) {
 				profile.HideTaxi = extraoptionsNode.attribute("hideTaxi").as_bool();
 			}
+			if (extraoptionsNode.attribute("hideItemSkills") != nullptr) {
+				profile.HideGlobalItemSkills = extraoptionsNode.attribute("hideItemSkills").as_bool();
+			}
 		}
 		if (pugi::xml_node textNode = profileNode.child("text"); textNode) {
 			auto text = textNode.text();

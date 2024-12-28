@@ -18,6 +18,7 @@
     <profiles>
         <profile name="1">
             <text>Only Gun</text>
+            <extra_options hideItemSkills="true" />
             <effect_options>
             </effect_options>
             <skill_options>
