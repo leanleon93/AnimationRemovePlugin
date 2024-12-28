@@ -3,6 +3,7 @@
 #ifdef _DEBUG
 #include <iostream>
 #endif // _DEBUG
+#include <Windows.h>
 
 PluginConfig g_PluginConfig;
 
@@ -21,6 +22,7 @@ std::string PluginConfig::GetDocumentsDirectory() {
 	if (const char* userProfile = std::getenv("USERPROFILE"); userProfile != nullptr) {
 		return std::string(userProfile) + "\\Documents";
 	}
+	MessageBox(nullptr, L"Could not find Documents directory.", L"AnimFilter Fatal Error", MB_OK | MB_ICONERROR);
 	return "";
 }
 
@@ -141,6 +143,7 @@ void PluginConfig::ReloadFromConfig()
 #ifdef _DEBUG
 		std::cerr << "Failed to load AnimFilter config file: " << result.description() << std::endl;
 #endif // _DEBUG
+		MessageBox(nullptr, L"Could not load config file.", L"AnimFilter Fatal Error", MB_OK | MB_ICONERROR);
 		Loaded = false;
 		return;
 	}
