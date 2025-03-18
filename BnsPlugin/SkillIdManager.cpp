@@ -2,6 +2,8 @@
 #include "EU/job/AAA_job_RecordBase.h"
 #include "EU/text/AAA_text_RecordBase.h"
 #include "EU/skill_inheritance/AAA_skill_inheritance_RecordBase.h"
+#include "EU/skillbookcatalogueitem/AAA_skillbookcatalogueitem_RecordBase.h"
+#include "EU/skill_train_by_item/AAA_skill_train_by_item_RecordBase.h"
 #include <algorithm>
 #include "EU/skill3/AAA_skill3_RecordBase.h"
 #include "EU/skill3/skill3_active_skill_Record.h"
@@ -70,6 +72,77 @@ std::unordered_set<int> SkillIdManager::GetInheritedIds(int id) {
 	return inheritedIds;
 }
 
+std::unordered_set<int> SkillIdManager::GetNeoChildSkillIds2(int id) {
+	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
+	if (!versionCheckSuccess.contains(L"skill-train-by-item") || !versionCheckSuccess[L"skill-train-by-item"]) {
+		return {};
+	}
+	const auto table = DataHelper::GetTable(manager, L"skill-train-by-item");
+	if (table == nullptr) return {};
+	auto innerIter = table->__vftable->createInnerIter_d0(table);
+	std::unordered_set<int> childIds;
+	do {
+		if (!innerIter->_vtptr->IsValid(innerIter)) continue;
+		auto record = (EU::skill_train_by_item_Record*)innerIter->_vtptr->Ptr(innerIter);
+		if (record == nullptr) continue;
+		if (auto skill3Key = Skill3KeyHelper::BuildKey(id, 1); record->main_origin_skill.Key != skill3Key) continue;
+		if (std::ranges::find(idExclusionList.begin(), idExclusionList.end(), id) != idExclusionList.end()) continue;
+		if (record->main_change_skill.Key != 0 && std::ranges::find(idExclusionList.begin(), idExclusionList.end(), Skill3KeyHelper::ExtractId(record->main_change_skill.Key)) == idExclusionList.end()) {
+			childIds.insert(Skill3KeyHelper::ExtractId(record->main_change_skill.Key));
+			auto nestedIds = GetNeoChildSkillIds(Skill3KeyHelper::ExtractId(record->main_change_skill.Key));
+			childIds.insert(nestedIds.begin(), nestedIds.end());
+		}
+		for (auto changeSkillRef : record->sub_change_skill) {
+			if (changeSkillRef.Key == 0) continue;
+			if (std::ranges::find(idExclusionList.begin(), idExclusionList.end(), Skill3KeyHelper::ExtractId(changeSkillRef.Key)) != idExclusionList.end()) continue;
+			childIds.insert(Skill3KeyHelper::ExtractId(changeSkillRef.Key));
+			auto nestedIds = GetNeoChildSkillIds(Skill3KeyHelper::ExtractId(changeSkillRef.Key));
+			childIds.insert(nestedIds.begin(), nestedIds.end());
+		}
+		for (auto changeSkillRef : record->sub_origin_skill) {
+			if (changeSkillRef.Key == 0) continue;
+			if (std::ranges::find(idExclusionList.begin(), idExclusionList.end(), Skill3KeyHelper::ExtractId(changeSkillRef.Key)) != idExclusionList.end()) continue;
+			childIds.insert(Skill3KeyHelper::ExtractId(changeSkillRef.Key));
+			auto nestedIds = GetNeoChildSkillIds(Skill3KeyHelper::ExtractId(changeSkillRef.Key));
+			childIds.insert(nestedIds.begin(), nestedIds.end());
+		}
+	} while (innerIter->_vtptr->Next(innerIter));
+	table->__vftable->removeInnerIter(table, innerIter);
+	return childIds;
+}
+
+std::unordered_set<int> SkillIdManager::GetNeoChildSkillIds(int id) {
+	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
+	if (!versionCheckSuccess.contains(L"skillbookcatalogueitem") || !versionCheckSuccess[L"skillbookcatalogueitem"]) {
+		return {};
+	}
+	const auto table = DataHelper::GetTable(manager, L"skillbookcatalogueitem");
+	if (table == nullptr) return {};
+	auto innerIter = table->__vftable->createInnerIter_d0(table);
+	std::unordered_set<int> childIds;
+	do {
+		if (!innerIter->_vtptr->IsValid(innerIter)) continue;
+		auto record = (EU::skillbookcatalogueitem_Record*)innerIter->_vtptr->Ptr(innerIter);
+		if (record == nullptr) continue;
+		if (auto skill3Key = Skill3KeyHelper::BuildKey(id, 1); record->parent_skill.Key != skill3Key) continue;
+		if (std::ranges::find(idExclusionList.begin(), idExclusionList.end(), id) != idExclusionList.end()) continue;
+		if (record->base_skill.Key != 0 && std::ranges::find(idExclusionList.begin(), idExclusionList.end(), Skill3KeyHelper::ExtractId(record->base_skill.Key)) == idExclusionList.end()) {
+			childIds.insert(Skill3KeyHelper::ExtractId(record->base_skill.Key));
+			auto nestedIds = GetNeoChildSkillIds(Skill3KeyHelper::ExtractId(record->base_skill.Key));
+			childIds.insert(nestedIds.begin(), nestedIds.end());
+		}
+		for (auto changeSkillRef : record->change_skill) {
+			if (changeSkillRef.Key == 0) continue;
+			if (std::ranges::find(idExclusionList.begin(), idExclusionList.end(), Skill3KeyHelper::ExtractId(changeSkillRef.Key)) != idExclusionList.end()) continue;
+			childIds.insert(Skill3KeyHelper::ExtractId(changeSkillRef.Key));
+			auto nestedIds = GetNeoChildSkillIds(Skill3KeyHelper::ExtractId(changeSkillRef.Key));
+			childIds.insert(nestedIds.begin(), nestedIds.end());
+		}
+	} while (innerIter->_vtptr->Next(innerIter));
+	table->__vftable->removeInnerIter(table, innerIter);
+	return childIds;
+}
+
 std::unordered_set<int> SkillIdManager::GetChildSkillIds(int id) {
 	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
 	if (!versionCheckSuccess.contains(L"skill3") || !versionCheckSuccess[L"skill3"]) {
@@ -128,6 +201,30 @@ void  SkillIdManager::AddVariableIds(EU::skill_trait_Record const* record, Skill
 }
 
 void SkillIdManager::AddChildrenSkillIds(SkillIdsForJob& skillIdsForJobEntry) {
+	for (auto const& [specIndex, skillIds] : skillIdsForJobEntry.SkillIdsForSpec) {
+		for (auto id : skillIds) {
+			auto childIds = GetChildSkillIds(id);
+			skillIdsForJobEntry.SkillIdsForSpec[specIndex].insert(childIds.begin(), childIds.end());
+		}
+	}
+	for (auto const& [specIndex, skillIds] : skillIdsForJobEntry.SkillIdsForSpec) {
+		for (auto id : skillIds) {
+			auto childIds = GetNeoChildSkillIds(id);
+			skillIdsForJobEntry.SkillIdsForSpec[specIndex].insert(childIds.begin(), childIds.end());
+		}
+	}
+	for (auto const& [specIndex, skillIds] : skillIdsForJobEntry.SkillIdsForSpec) {
+		for (auto id : skillIds) {
+			auto childIds = GetNeoChildSkillIds2(id);
+			skillIdsForJobEntry.SkillIdsForSpec[specIndex].insert(childIds.begin(), childIds.end());
+		}
+	}
+	for (auto const& [specIndex, skillIds] : skillIdsForJobEntry.SkillIdsForSpec) {
+		for (auto id : skillIds) {
+			auto inheritedIds = GetInheritedIds(id);
+			skillIdsForJobEntry.SkillIdsForSpec[specIndex].insert(inheritedIds.begin(), inheritedIds.end());
+		}
+	}
 	for (auto const& [specIndex, skillIds] : skillIdsForJobEntry.SkillIdsForSpec) {
 		for (auto id : skillIds) {
 			auto childIds = GetChildSkillIds(id);
@@ -833,4 +930,17 @@ const std::unordered_map<__int32, __int16>& SkillIdManager::GetTaxiExclusionIdVa
 
 const std::unordered_set<int>& SkillIdManager::GetTaxiSkillIds() const {
 	return taxiExclusionIds;
+}
+
+__int64 SkillIdManager::Skill3KeyHelper::BuildKey(__int32 skillId, signed char variation_id)
+{
+	EU::skill3_Record::Key key{};
+	key.id = skillId;
+	key.variation_id = variation_id;
+	return std::bit_cast<__int64>(key);
+}
+
+__int32 SkillIdManager::Skill3KeyHelper::ExtractId(__int64 key)
+{
+	return static_cast<__int32>(key);
 }

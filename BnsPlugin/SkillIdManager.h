@@ -26,6 +26,10 @@ public:
 	const std::unordered_set<int>& GetTaxiSkillIds() const;
 	const std::unordered_map<__int32, __int16>& GetTaxiExclusionIdVariations() const;
 	Data::DataManager* GetDataManager();
+	struct Skill3KeyHelper {
+		static __int64 BuildKey(__int32 skillId, signed char variation_id);
+		static __int32 ExtractId(__int64 key);
+	};
 	struct SkillShow3KeyHelper {
 		static __int64 BuildKey(__int32 id_, __int16 variation_id_, __int16 skillskin_id_);
 		static BnsTables::EU::skillshow3_Record::Key ExtractKey(__int64 key);
@@ -116,6 +120,8 @@ private:
 	void AddVariableIds(BnsTables::EU::skill_trait_Record const* record, SkillIdsForJob& skillIdsForJobEntry);
 	std::unordered_set<int> GetInheritedIds(int id);
 	void AddChildrenSkillIds(SkillIdsForJob& skillIdsForJobEntry);
+	std::unordered_set<int> GetNeoChildSkillIds(int id);
+	std::unordered_set<int> GetNeoChildSkillIds2(int id);
 	std::unordered_set<int> GetChildSkillIds(int id);
 	void FilterBracelet(SkillIdsForJob& skillIdsForJobEntry);
 	bool IsBraceletId(int id);
@@ -136,7 +142,9 @@ private:
 		L"skill-trait",
 		L"itemskill",
 		L"skill-inheritance",
-		L"effect-group"
+		L"effect-group",
+		L"skillbookcatalogueitem",
+		L"skill-train-by-item"
 	};
 
 	std::unordered_map<std::wstring, bool> versionCheckSuccess = {
@@ -147,7 +155,10 @@ private:
 		{ L"skill-trait", false },
 		{ L"itemskill", false },
 		{ L"skill-inheritance", false },
-		{ L"effect-group", false } };
+		{ L"effect-group", false },
+		{ L"skillbookcatalogueitem", false },
+		{ L"skill-train-by-item", false }
+	};
 
 	const std::unordered_set<char> jobIdsFallback = {
 		1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16

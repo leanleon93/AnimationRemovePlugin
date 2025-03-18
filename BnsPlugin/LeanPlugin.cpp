@@ -128,6 +128,33 @@ static __int64* HookDataManager(const char* pattern, int offset2) {
 	return nullptr;
 }
 
+/// <summary>
+/// </summary>
+/// <typeparam name="FuncType"></typeparam>
+/// <param name="pattern"></param>
+/// <param name="offset"></param>
+/// <param name="originalFunction"></param>
+/// <param name="debugName"></param>
+/// <returns></returns>
+template<typename FuncType>
+uintptr_t GetFunctionPtr(const char* pattern, int offset, FuncType& originalFunction, const char* debugName)
+{
+	if (auto it = std::search(data.begin(), data.end(), pattern_searcher(pattern)); it != data.end()) {
+		uintptr_t address = (uintptr_t)&it[0] + offset;
+#ifdef _DEBUG
+		printf("Address of %s is %p\n", debugName, (void*)address);
+		std::cout << std::endl;
+#endif // _DEBUG
+		originalFunction = module->rva_to<std::remove_pointer_t<FuncType>>(address - handle);
+		return address;
+	}
+#ifdef _DEBUG
+	printf("Failed to find %s\n", debugName);
+	std::cout << std::endl;
+#endif // _DEBUG
+	return 0;
+}
+
 static __int64* WINAPI InitDetours() {
 #ifdef _DEBUG
 	std::cout << "InitDetours" << std::endl;
@@ -136,15 +163,15 @@ static __int64* WINAPI InitDetours() {
 	DetourUpdateThread(NtCurrentThread());
 
 	HookFunction(xorstr_("48 85 D2 0F 84 ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B F8 48 85 C0 0F 84 ?? ?? ?? ?? 4C 8B 03"), -0x15, oBUIWorld_ProcessEvent, &hkBUIWorld_ProcessEvent, "aBUIWorld_ProcessEvent");
-	auto pattern = xorstr_("0F B6 C0 85 C0 75 07 32 C0 E9 ?? 07 00 00 E8 ?? ?? ?? ?? 48 ?? ?? ?? ?? 00 00 00 48 ?? ?? ?? ?? 00 00 00 48 8B 00 48 8B ?? ?? ?? ?? 00 00 48 8B ?? ?? ?? ?? 00 00 FF 90 B8 00 00 00 48 8B D0 48 ?? ?? ?? ??");
+	auto pattern = xorstr_("0F B6 C0 85 C0 75 07 32 C0 E9 ?? 07 00 00 E8 ?? ?? ?? ?? 48 ?? ?? ?? ?? 00 00 00 48 ?? ?? ?? ?? 00 00 00 48 8B 00 48 8B ?? ?? ?? ?? 00 00 48 8B ?? ?? ?? ?? 00 00 FF 90 ?? 00 00 00 48 8B D0 48 ?? ?? ?? ??");
 	auto dataManagerPtr = HookDataManager(pattern, 0xF);
-	HookFunction(xorstr_("80 79 12 00 ?? ?? 48 8B 49 14 E9 ?? ?? ?? ?? 48 8B 41 24 48 83 C1 24 48 FF 60 18"), 0x00, oFind_b8, hkFind_b8, "Find_b8");
+	HookFunction(xorstr_("48 8B 49 14 E9 ?? ?? ?? ?? 48 81 C1 D4 01 00 00 48 8B 01 48 FF 60 18 CC"), -0x06, oFind_b8, hkFind_b8, "Find_b8"); //shorter function
+	GetFunctionPtr(xorstr_("48 8B 05 ?? ?? ?? ?? 48 85 C0 74 ?? 48 8B 80 ?? ?? ?? ?? C3 C3 CC CC CC CC CC CC CC CC CC CC CC 48 8B 05"), 0x00, BNSClient_GetWorld, "BNSClient_GetWorld");
 
 	DetourTransactionCommit();
 	return dataManagerPtr;
 }
 
-uintptr_t* BNSClientInstancePtr;
 _AddInstantNotification oAddInstantNotification;
 
 /// <summary>
@@ -156,17 +183,6 @@ static void WINAPI InitMessaging() {
 #ifdef _DEBUG
 	std::cout << "InitMessaging" << std::endl;
 #endif // _DEBUG
-
-#ifdef _DEBUG
-	std::cout << "Searching BnsClientInstancePtr" << std::endl;
-#endif // _DEBUG
-
-	if (auto result = std::search(data.begin(), data.end(), pattern_searcher(xorstr_("48 8B 05 ?? ?? ?? ?? 48 85 C0 74 ?? 48 8B 80 ?? ?? ?? ?? C3 C3 CC CC CC CC CC CC CC CC CC CC CC 48 8B 05"))); result != data.end()) {
-		auto getWorldAddress = (uintptr_t)&result[0];
-		auto bnsclientInstanceOffset = *reinterpret_cast<int*>(getWorldAddress + 3);
-		auto bnsclientInstanceAddress = getWorldAddress + bnsclientInstanceOffset + 7;
-		BNSClientInstancePtr = reinterpret_cast<uintptr_t*>(bnsclientInstanceAddress);
-	}
 
 #ifdef _DEBUG
 	std::cout << "Searching AddInstantNotification" << std::endl;
@@ -189,7 +205,6 @@ static void WINAPI InitMessaging() {
 #endif // _DEBUG
 
 #ifdef _DEBUG
-	printf("Address of BNSInstance is %p\n", (void*)BNSClientInstancePtr);
 	printf("Address of AddInstantNotification is %p\n", (void*)oAddInstantNotification);
 	std::cout << std::endl;
 #endif // _DEBUG

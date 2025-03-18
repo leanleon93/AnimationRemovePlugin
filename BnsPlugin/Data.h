@@ -62,13 +62,13 @@ struct DrLoaderDef;
 struct DrDataTable;
 struct /*VFT*/ DrDataTable_vtbl
 {
-	char padding[0xB0];
+	char padding[0xB0 + 0x48];
+	DrInnerIter* (__fastcall* createInnerIter_d0)(DrDataTable* thisptr);
+	void(__fastcall* removeInnerIter)(DrDataTable* thisptr, DrInnerIter*);
+	char padding2[0x40];
 	BnsTables::Shared::DrEl* (__fastcall* Find)(DrDataTable* thisptr, const wchar_t*, const DrAliasMap*);
 	BnsTables::Shared::DrEl* (__fastcall* Find_b8)(DrDataTable* thisptr, unsigned __int64);
 	void(__fastcall* SetUseLowMemory)(DrDataTable* thisptr, bool);
-	DrInnerIter* (__fastcall* createInnerIter)(DrDataTable* thisptr, BnsTables::Shared::DrEl* const);
-	DrInnerIter* (__fastcall* createInnerIter_d0)(DrDataTable* thisptr);
-	void(__fastcall* removeInnerIter)(DrDataTable* thisptr, DrInnerIter*);
 };
 
 struct DrDataTable

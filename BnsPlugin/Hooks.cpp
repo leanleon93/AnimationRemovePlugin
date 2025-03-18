@@ -78,7 +78,6 @@ static void ReloadSkillShow3OnHotkeyPress() {
 	}
 }
 
-extern uintptr_t* BNSClientInstancePtr;
 extern _AddInstantNotification oAddInstantNotification;
 
 static void ReloadConfigOnHotkeyPress() {
@@ -87,9 +86,10 @@ static void ReloadConfigOnHotkeyPress() {
 	g_SkillIdManager.ReapplyEffectFilters();
 	ReloadSkillShow3OnHotkeyPress();
 	auto message = LR"(AnimFilter Config Reloaded)";
-	BSMessaging::DisplaySystemChatMessage(BNSClientInstancePtr, &oAddInstantNotification, message, false);
+	auto gameWorld = BNSClient_GetWorld();
+	BSMessaging::DisplaySystemChatMessage(gameWorld, &oAddInstantNotification, message, false);
 	if (g_PluginConfig.AnimFilterEnabled() && g_PluginConfig.GetActiveProfile().Text != L"") {
-		BSMessaging::DisplaySystemChatMessage(BNSClientInstancePtr, &oAddInstantNotification, g_PluginConfig.GetActiveProfile().Text.c_str(), false);
+		BSMessaging::DisplaySystemChatMessage(gameWorld, &oAddInstantNotification, g_PluginConfig.GetActiveProfile().Text.c_str(), false);
 	}
 }
 
@@ -100,9 +100,10 @@ static void SetProfileOnHotkeyPress(int profileId) {
 	ReloadSkillShow3OnHotkeyPress();
 	if (!g_PluginConfig.AnimFilterEnabled()) return;
 	std::wstring message = std::format(LR"(AnimFilter Using Profile {})", profileId);
-	BSMessaging::DisplaySystemChatMessage(BNSClientInstancePtr, &oAddInstantNotification, message.c_str(), false);
+	auto gameWorld = BNSClient_GetWorld();
+	BSMessaging::DisplaySystemChatMessage(gameWorld, &oAddInstantNotification, message.c_str(), false);
 	if (g_PluginConfig.GetActiveProfile().Text != L"") {
-		BSMessaging::DisplaySystemChatMessage(BNSClientInstancePtr, &oAddInstantNotification, g_PluginConfig.GetActiveProfile().Text.c_str(), false);
+		BSMessaging::DisplaySystemChatMessage(gameWorld, &oAddInstantNotification, g_PluginConfig.GetActiveProfile().Text.c_str(), false);
 	}
 }
 
@@ -201,3 +202,5 @@ BnsTables::Shared::DrEl* __fastcall hkFind_b8(DrMultiKeyTable* thisptr, unsigned
 	reloadRequired = true;
 	return recordBase;
 }
+
+void* (__fastcall* BNSClient_GetWorld)();
