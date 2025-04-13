@@ -9,18 +9,30 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
-		Release|x64 = Release|x64
-		Release|x86 = Release|x86
+		DebugKR|x64 = DebugKR|x64
+		DebugKR|x86 = DebugKR|x86
+		ReleaseEU|x64 = ReleaseEU|x64
+		ReleaseEU|x86 = ReleaseEU|x86
+		ReleaseKR|x64 = ReleaseKR|x64
+		ReleaseKR|x86 = ReleaseKR|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{FC9900C8-8CCB-487C-89F8-42FFE5C9AC9F}.Debug|x64.ActiveCfg = Debug|x64
 		{FC9900C8-8CCB-487C-89F8-42FFE5C9AC9F}.Debug|x64.Build.0 = Debug|x64
 		{FC9900C8-8CCB-487C-89F8-42FFE5C9AC9F}.Debug|x86.ActiveCfg = Debug|Win32
 		{FC9900C8-8CCB-487C-89F8-42FFE5C9AC9F}.Debug|x86.Build.0 = Debug|Win32
-		{FC9900C8-8CCB-487C-89F8-42FFE5C9AC9F}.Release|x64.ActiveCfg = Release|x64
-		{FC9900C8-8CCB-487C-89F8-42FFE5C9AC9F}.Release|x64.Build.0 = Release|x64
-		{FC9900C8-8CCB-487C-89F8-42FFE5C9AC9F}.Release|x86.ActiveCfg = Release|Win32
-		{FC9900C8-8CCB-487C-89F8-42FFE5C9AC9F}.Release|x86.Build.0 = Release|Win32
+		{FC9900C8-8CCB-487C-89F8-42FFE5C9AC9F}.DebugKR|x64.ActiveCfg = DebugKR|x64
+		{FC9900C8-8CCB-487C-89F8-42FFE5C9AC9F}.DebugKR|x64.Build.0 = DebugKR|x64
+		{FC9900C8-8CCB-487C-89F8-42FFE5C9AC9F}.DebugKR|x86.ActiveCfg = DebugKR|Win32
+		{FC9900C8-8CCB-487C-89F8-42FFE5C9AC9F}.DebugKR|x86.Build.0 = DebugKR|Win32
+		{FC9900C8-8CCB-487C-89F8-42FFE5C9AC9F}.ReleaseEU|x64.ActiveCfg = ReleaseEU|x64
+		{FC9900C8-8CCB-487C-89F8-42FFE5C9AC9F}.ReleaseEU|x64.Build.0 = ReleaseEU|x64
+		{FC9900C8-8CCB-487C-89F8-42FFE5C9AC9F}.ReleaseEU|x86.ActiveCfg = ReleaseEU|Win32
+		{FC9900C8-8CCB-487C-89F8-42FFE5C9AC9F}.ReleaseEU|x86.Build.0 = ReleaseEU|Win32
+		{FC9900C8-8CCB-487C-89F8-42FFE5C9AC9F}.ReleaseKR|x64.ActiveCfg = ReleaseKR|x64
+		{FC9900C8-8CCB-487C-89F8-42FFE5C9AC9F}.ReleaseKR|x64.Build.0 = ReleaseKR|x64
+		{FC9900C8-8CCB-487C-89F8-42FFE5C9AC9F}.ReleaseKR|x86.ActiveCfg = ReleaseKR|Win32
+		{FC9900C8-8CCB-487C-89F8-42FFE5C9AC9F}.ReleaseKR|x86.Build.0 = ReleaseKR|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

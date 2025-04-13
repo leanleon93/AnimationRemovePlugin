@@ -3,9 +3,12 @@
 #include <unordered_map>
 #include <string>
 #include "EU/skillshow3/AAA_skillshow3_RecordBase.h"
+#include "KR/skillshow3/AAA_skillshow3_RecordBase.h"
 #include "Data.h"
 #include "EU/skill_trait/AAA_skill_trait_RecordBase.h"
+#include "KR/skill_trait/AAA_skill_trait_RecordBase.h"
 #include "EU/effect/AAA_effect_RecordBase.h"
+#include "KR/effect/AAA_effect_RecordBase.h"
 
 class SkillIdManager {
 	struct SkillIdsForJob {
@@ -32,7 +35,11 @@ public:
 	};
 	struct SkillShow3KeyHelper {
 		static __int64 BuildKey(__int32 id_, __int16 variation_id_, __int16 skillskin_id_);
+#if _BNSEU
 		static BnsTables::EU::skillshow3_Record::Key ExtractKey(__int64 key);
+#elif _BNSKR
+		static BnsTables::KR::skillshow3_Record::Key ExtractKey(__int64 key);
+#endif
 		static __int32 ExtractId(__int64 key);
 	};
 	void SetDataManagerPtr(__int64 const* ptr);
@@ -115,9 +122,19 @@ private:
 	bool SetupSkillShowTableId();
 	bool SetupSkillIdsForJob(char jobId);
 	bool SetupEffectIdsForJob(char jobId);
+#if _BNSEU
 	void AddIds(BnsTables::EU::skill_trait_Record const* record, int const* ids, int size, SkillIdsForJob& skillIdsForJobEntry);
 	void AddFixedIds(BnsTables::EU::skill_trait_Record const* record, SkillIdsForJob& skillIdsForJobEntry);
 	void AddVariableIds(BnsTables::EU::skill_trait_Record const* record, SkillIdsForJob& skillIdsForJobEntry);
+	void SwapAnimationsForEffect(BnsTables::EU::effect_Record* target, BnsTables::EU::effect_Record* animation);
+	void RemoveAnimationsForEffect(BnsTables::EU::effect_Record* effectRecord);
+#elif _BNSKR
+	void AddIds(BnsTables::KR::skill_trait_Record const* record, int const* ids, int size, SkillIdsForJob& skillIdsForJobEntry);
+	void AddFixedIds(BnsTables::KR::skill_trait_Record const* record, SkillIdsForJob& skillIdsForJobEntry);
+	void AddVariableIds(BnsTables::KR::skill_trait_Record const* record, SkillIdsForJob& skillIdsForJobEntry);
+	void SwapAnimationsForEffect(BnsTables::KR::effect_Record* target, BnsTables::KR::effect_Record* animation);
+	void RemoveAnimationsForEffect(BnsTables::KR::effect_Record* effectRecord);
+#endif
 	std::unordered_set<int> GetInheritedIds(int id);
 	void AddChildrenSkillIds(SkillIdsForJob& skillIdsForJobEntry);
 	std::unordered_set<int> GetNeoChildSkillIds(int id);
@@ -130,8 +147,7 @@ private:
 	void RestoreEffects();
 	void RemoveEffects();
 	void SwapEffects();
-	void SwapAnimationsForEffect(BnsTables::EU::effect_Record* target, BnsTables::EU::effect_Record* animation);
-	void RemoveAnimationsForEffect(BnsTables::EU::effect_Record* effectRecord);
+
 	std::unordered_set<unsigned __int64> GetEffectIdsForEffectGroup(unsigned __int64 effectGroupId);
 	bool CompatabilityCheck();
 	const std::unordered_set<std::wstring> usedTables = {

@@ -1,22 +1,34 @@
 #include "SkillIdManager.h"
+#include <algorithm>
 #include "EU/job/AAA_job_RecordBase.h"
 #include "EU/text/AAA_text_RecordBase.h"
 #include "EU/skill_inheritance/AAA_skill_inheritance_RecordBase.h"
 #include "EU/skillbookcatalogueitem/AAA_skillbookcatalogueitem_RecordBase.h"
 #include "EU/skill_train_by_item/AAA_skill_train_by_item_RecordBase.h"
-#include <algorithm>
 #include "EU/skill3/AAA_skill3_RecordBase.h"
 #include "EU/skill3/skill3_active_skill_Record.h"
 #include "EU/itemskill/AAA_itemskill_RecordBase.h"
+#include "EU/effect_group/AAA_effect_group_RecordBase.h"
+#include "EU/BnsTableNames.h"
+
+#include "KR/job/AAA_job_RecordBase.h"
+#include "KR/text/AAA_text_RecordBase.h"
+#include "KR/skill_inheritance/AAA_skill_inheritance_RecordBase.h"
+#include "KR/skillbookcatalogueitem/AAA_skillbookcatalogueitem_RecordBase.h"
+#include "KR/skill_train_by_item/AAA_skill_train_by_item_RecordBase.h"
+#include "KR/skill3/AAA_skill3_RecordBase.h"
+#include "KR/skill3/skill3_active_skill_Record.h"
+#include "KR/itemskill/AAA_itemskill_RecordBase.h"
+#include "KR/effect_group/AAA_effect_group_RecordBase.h"
+#include "KR/BnsTableNames.h"
+
 #include "PluginConfig.h"
 #include <Windows.h>
 #ifdef _DEBUG
 #include <iostream>
 #include <utility>
 #endif // _DEBUG
-#include "EU/effect_group/AAA_effect_group_RecordBase.h"
 #include "SkillTraitJobstyleHelper.cpp"
-#include "EU/BnsTableNames.h"
 
 using namespace BnsTables;
 
@@ -60,7 +72,13 @@ std::unordered_set<int> SkillIdManager::GetInheritedIds(int id) {
 	std::unordered_set<int> inheritedIds;
 	do {
 		if (!innerIter->_vtptr->IsValid(innerIter)) continue;
+#ifdef _BNSEU
 		auto record = (EU::skill_inheritance_Record*)innerIter->_vtptr->Ptr(innerIter);
+
+#elif _BNSKR
+		auto record = (KR::skill_inheritance_Record*)innerIter->_vtptr->Ptr(innerIter);
+
+#endif
 		if (record == nullptr) continue;
 		if (record->parent_skill_id != id) continue;
 		if (std::ranges::find(idExclusionList.begin(), idExclusionList.end(), record->key.skill_id) != idExclusionList.end()) continue;
@@ -83,7 +101,13 @@ std::unordered_set<int> SkillIdManager::GetNeoChildSkillIds2(int id) {
 	std::unordered_set<int> childIds;
 	do {
 		if (!innerIter->_vtptr->IsValid(innerIter)) continue;
+#ifdef _BNSEU
 		auto record = (EU::skill_train_by_item_Record*)innerIter->_vtptr->Ptr(innerIter);
+
+#elif _BNSKR
+		auto record = (KR::skill_train_by_item_Record*)innerIter->_vtptr->Ptr(innerIter);
+
+#endif
 		if (record == nullptr) continue;
 		if (auto skill3Key = Skill3KeyHelper::BuildKey(id, 1); record->main_origin_skill.Key != skill3Key) continue;
 		if (std::ranges::find(idExclusionList.begin(), idExclusionList.end(), id) != idExclusionList.end()) continue;
@@ -122,7 +146,13 @@ std::unordered_set<int> SkillIdManager::GetNeoChildSkillIds(int id) {
 	std::unordered_set<int> childIds;
 	do {
 		if (!innerIter->_vtptr->IsValid(innerIter)) continue;
+#ifdef _BNSEU
 		auto record = (EU::skillbookcatalogueitem_Record*)innerIter->_vtptr->Ptr(innerIter);
+
+#elif _BNSKR
+		auto record = (KR::skillbookcatalogueitem_Record*)innerIter->_vtptr->Ptr(innerIter);
+
+#endif
 		if (record == nullptr) continue;
 		if (auto skill3Key = Skill3KeyHelper::BuildKey(id, 1); record->parent_skill.Key != skill3Key) continue;
 		if (std::ranges::find(idExclusionList.begin(), idExclusionList.end(), id) != idExclusionList.end()) continue;
@@ -156,8 +186,14 @@ std::unordered_set<int> SkillIdManager::GetChildSkillIds(int id) {
 		if (!innerIter->_vtptr->IsValid(innerIter)) continue;
 		auto record = innerIter->_vtptr->Ptr(innerIter);
 		if (record == nullptr) continue;
+#ifdef _BNSEU
 		if (record->subtype != (__int16)std::to_underlying(EU::skill3_RecordSubType::skill3_record_sub_active_skill)) continue;
 		auto activeSkillRecord = (EU::skill3_active_skill_Record*)record;
+#elif _BNSKR
+		if (record->subtype != (__int16)std::to_underlying(KR::skill3_RecordSubType::skill3_record_sub_active_skill)) continue;
+		auto activeSkillRecord = (KR::skill3_active_skill_Record*)record;
+#endif
+
 		if (activeSkillRecord->key.id != id) continue;
 		if (std::ranges::find(idExclusionList.begin(), idExclusionList.end(), activeSkillRecord->key.id) != idExclusionList.end()) continue;
 		for (auto key : activeSkillRecord->children_skill) {
@@ -173,8 +209,11 @@ std::unordered_set<int> SkillIdManager::GetChildSkillIds(int id) {
 	table->__vftable->removeInnerIter(table, innerIter);
 	return childIds;
 }
-
+#ifdef _BNSEU
 void SkillIdManager::AddIds(EU::skill_trait_Record const* record, int const* ids, int size, SkillIdsForJob& skillIdsForJobEntry) {
+#elif _BNSKR
+void SkillIdManager::AddIds(KR::skill_trait_Record const* record, int const* ids, int size, SkillIdsForJob & skillIdsForJobEntry) {
+#endif
 	auto jobStyleIndex = Data::SkillTraitJobStyleHelper::GetSpecIndexForJobStyleType(record->key.job_style);
 	if (jobStyleIndex <= 0) return;
 	if (!skillIdsForJobEntry.SkillIdsForSpec.contains(jobStyleIndex)) {
@@ -189,18 +228,25 @@ void SkillIdManager::AddIds(EU::skill_trait_Record const* record, int const* ids
 		skillIdsForJobEntry.SkillIdsForSpec[jobStyleIndex].insert(inheritedIds.begin(), inheritedIds.end());
 	}
 }
-
-void  SkillIdManager::AddFixedIds(EU::skill_trait_Record const* record, SkillIdsForJob& skillIdsForJobEntry) {
+#ifdef _BNSEU
+void  SkillIdManager::AddFixedIds(EU::skill_trait_Record const* record, SkillIdsForJob & skillIdsForJobEntry) {
+#elif _BNSKR
+void  SkillIdManager::AddFixedIds(KR::skill_trait_Record const* record, SkillIdsForJob & skillIdsForJobEntry) {
+#endif
 	int size = sizeof(record->fixed_skill3_id) / sizeof(record->fixed_skill3_id[0]);
 	AddIds(record, record->fixed_skill3_id, size, skillIdsForJobEntry);
 }
 
-void  SkillIdManager::AddVariableIds(EU::skill_trait_Record const* record, SkillIdsForJob& skillIdsForJobEntry) {
+#ifdef _BNSEU
+void  SkillIdManager::AddVariableIds(EU::skill_trait_Record const* record, SkillIdsForJob & skillIdsForJobEntry) {
+#elif _BNSKR
+void  SkillIdManager::AddVariableIds(KR::skill_trait_Record const* record, SkillIdsForJob & skillIdsForJobEntry) {
+#endif
 	int size = sizeof(record->variable_skill3_id) / sizeof(record->variable_skill3_id[0]);
 	AddIds(record, record->variable_skill3_id, size, skillIdsForJobEntry);
 }
 
-void SkillIdManager::AddChildrenSkillIds(SkillIdsForJob& skillIdsForJobEntry) {
+void SkillIdManager::AddChildrenSkillIds(SkillIdsForJob & skillIdsForJobEntry) {
 	for (auto const& [specIndex, skillIds] : skillIdsForJobEntry.SkillIdsForSpec) {
 		for (auto id : skillIds) {
 			auto childIds = GetChildSkillIds(id);
@@ -255,7 +301,11 @@ std::unordered_set<int> SkillIdManager::GetItemSkills(int id) {
 	std::unordered_set<int> itemSkills;
 	do {
 		if (!innerIter->_vtptr->IsValid(innerIter)) continue;
+#ifdef _BNSEU
 		auto record = (EU::itemskill_Record*)innerIter->_vtptr->Ptr(innerIter);
+#elif _BNSKR
+		auto record = (KR::itemskill_Record*)innerIter->_vtptr->Ptr(innerIter);
+#endif
 		if (record == nullptr) continue;
 		if (record->skill_id != id) continue;
 		auto itemSimSkillId = static_cast<__int32>(record->item_sim_skill.Key);
@@ -266,7 +316,7 @@ std::unordered_set<int> SkillIdManager::GetItemSkills(int id) {
 	return itemSkills;
 }
 
-void SkillIdManager::AddItemSkills(SkillIdsForJob& skillIdsForJobEntry) {
+void SkillIdManager::AddItemSkills(SkillIdsForJob & skillIdsForJobEntry) {
 	for (auto const& [specIndex, skillIds] : skillIdsForJobEntry.SkillIdsForSpec) {
 		for (auto id : skillIds) {
 			auto itemSkills = GetItemSkills(id);
@@ -288,10 +338,18 @@ bool SkillIdManager::SetupSkillIdsForJob(char jobId) {
 
 	auto innerIter = table->__vftable->createInnerIter_d0(table);
 	//loop
+#ifdef _BNSEU
 	std::vector<EU::skill_trait_Record> filteredTraitRecords;
+#elif _BNSKR
+	std::vector<KR::skill_trait_Record> filteredTraitRecords;
+#endif
 	do {
 		if (!innerIter->_vtptr->IsValid(innerIter)) continue;
+#ifdef _BNSEU
 		auto record = (EU::skill_trait_Record*)innerIter->_vtptr->Ptr(innerIter);
+#elif _BNSKR
+		auto record = (KR::skill_trait_Record*)innerIter->_vtptr->Ptr(innerIter);
+#endif
 		if (record == nullptr) continue;
 		if (record->key.job != jobId) continue;
 		AddFixedIds(record, skillIdsForJobEntry);
@@ -313,7 +371,11 @@ std::unordered_set<unsigned __int64> SkillIdManager::GetEffectIdsForEffectGroup(
 	if (table == nullptr) return  { };
 	auto record = table->__vftable->Find_b8(table, effectGroupId);
 	if (record == nullptr) return  { };
+#ifdef _BNSEU
 	auto effectGroupRecord = (EU::effect_group_Record*)record;
+#elif _BNSKR
+	auto effectGroupRecord = (KR::effect_group_Record*)record;
+#endif
 	std::unordered_set<unsigned __int64> effectIds;
 	for (auto effectId : effectGroupRecord->effect) {
 		if (effectId.Key == 0) continue;
@@ -349,10 +411,18 @@ bool SkillIdManager::SetupEffectIdsForJob(char jobId) {
 			auto innerIter = table->__vftable->createInnerIter_d0(table);
 			do {
 				if (!innerIter->_vtptr->IsValid(innerIter)) continue;
+#ifdef _BNSEU
 				auto record = (EU::skill3_Record*)innerIter->_vtptr->Ptr(innerIter);
+#elif _BNSKR
+				auto record = (KR::skill3_Record*)innerIter->_vtptr->Ptr(innerIter);
+#endif
 				if (record == nullptr) continue;
 				if (record->key.id != id) continue;
+#ifdef _BNSEU
 				if (record->subtype != (__int16)EU::skill3_RecordSubType::skill3_record_sub_active_skill) continue;
+#elif _BNSKR
+				if (record->subtype != (__int16)KR::skill3_RecordSubType::skill3_record_sub_active_skill) continue;
+#endif
 				bool breakOuter = false;
 				for (auto const& systematization : record->systematization) {
 					if (systematization.Key == 0) continue;
@@ -362,7 +432,11 @@ bool SkillIdManager::SetupEffectIdsForJob(char jobId) {
 					}
 				}
 				if (breakOuter) continue;
+#ifdef _BNSEU
 				auto activeSkillRecord = (EU::skill3_active_skill_Record*)record;
+#elif _BNSKR
+				auto activeSkillRecord = (KR::skill3_active_skill_Record*)record;
+#endif
 				for (auto passiveEffect : activeSkillRecord->passive_effect) {
 					if (passiveEffect.Key == 0) continue;
 					effectIdsForJobEntry.EffectIdsForSpec[specIndex].insert(passiveEffect.Key);
@@ -479,10 +553,19 @@ bool SkillIdManager::SetupJobNameMap() {
 	auto innerIter = table->__vftable->createInnerIter_d0(table);
 	do {
 		if (!innerIter->_vtptr->IsValid(innerIter)) continue;
+#ifdef _BNSEU
 		auto record = (EU::job_Record*)innerIter->_vtptr->Ptr(innerIter);
+#elif _BNSKR
+		auto record = (KR::job_Record*)innerIter->_vtptr->Ptr(innerIter);
+#endif
 		if (record == nullptr) continue;
 		jobIds.insert(record->key.job);
+		if (record->name2.Key == 0) continue;
+#ifdef _BNSEU
 		auto enJobName = (EU::text_Record*)textTable->__vftable->Find_b8(textTable, record->name2.Key);
+#elif _BNSKR
+		auto enJobName = (KR::text_Record*)textTable->__vftable->Find_b8(textTable, record->name2.Key);
+#endif
 		jobNameMap[enJobName->text.ReadableText] = record->key.job;
 #ifdef _DEBUG
 		std::wcout << "{ L\"" << enJobName->text.ReadableText << "\", " << +record->key.job << " }," << std::endl;
@@ -521,7 +604,11 @@ bool SkillIdManager::CompatabilityCheck() {
 		printf("\tAddress of %s is %p\n", "type", &tableDef->type);
 		std::cout << std::endl;
 #endif // _DEBUG
+#ifdef _BNSEU
 		auto confirmedVersion = EU::TableNames::GetTableVersion(EU::TableNames::GetTableId(tableName));
+#elif _BNSKR
+		auto confirmedVersion = KR::TableNames::GetTableVersion(KR::TableNames::GetTableId(tableName));
+#endif
 #ifdef _DEBUG
 		std::wcout << "Confirmed version for " << tableName << " is " << confirmedVersion.Version.VersionKey << std::endl;
 		std::wcout << "Confirmed major version for " << tableName << " is " << confirmedVersion.Version.MajorVersion << std::endl;
@@ -561,7 +648,7 @@ Data::DataManager* SkillIdManager::GetDataManager() {
 	return reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
 }
 
-static void addIdsForSpec(std::unordered_set<int>& idsToFilter, std::unordered_map<int, std::unordered_set<int>>& skillIdsForSpec, int specIndex) {
+static void addIdsForSpec(std::unordered_set<int>&idsToFilter, std::unordered_map<int, std::unordered_set<int>>&skillIdsForSpec, int specIndex) {
 	auto skillIdsForSpecRecord = skillIdsForSpec.find(specIndex);
 	if (skillIdsForSpecRecord != skillIdsForSpec.end()) {
 		for (auto id : skillIdsForSpecRecord->second) {
@@ -570,7 +657,7 @@ static void addIdsForSpec(std::unordered_set<int>& idsToFilter, std::unordered_m
 	}
 }
 
-static void removeIdsForSpec(std::unordered_set<int>& idsToFilter, std::unordered_map<int, std::unordered_set<int>>& skillIdsForSpec, int specIndex) {
+static void removeIdsForSpec(std::unordered_set<int>&idsToFilter, std::unordered_map<int, std::unordered_set<int>>&skillIdsForSpec, int specIndex) {
 	auto skillIdsForSpecRecord = skillIdsForSpec.find(specIndex);
 	if (skillIdsForSpecRecord != skillIdsForSpec.end()) {
 		for (auto id : skillIdsForSpecRecord->second) {
@@ -643,7 +730,7 @@ void SkillIdManager::ResetIdsToFilter() {
 	ResetEffectIdsToFilter();
 }
 
-static void addEffectIdsForSpec(std::unordered_set<unsigned __int64>& idsToFilter, std::unordered_map<int, std::unordered_set<unsigned __int64>>& effectIdsForSpec, int specIndex) {
+static void addEffectIdsForSpec(std::unordered_set<unsigned __int64>&idsToFilter, std::unordered_map<int, std::unordered_set<unsigned __int64>>&effectIdsForSpec, int specIndex) {
 	auto effectIdsForSpecRecord = effectIdsForSpec.find(specIndex);
 	if (effectIdsForSpecRecord != effectIdsForSpec.end()) {
 		for (auto id : effectIdsForSpecRecord->second) {
@@ -652,7 +739,7 @@ static void addEffectIdsForSpec(std::unordered_set<unsigned __int64>& idsToFilte
 	}
 }
 
-static void removeEffectIdsForSpec(std::unordered_set<unsigned __int64>& idsToFilter, std::unordered_map<int, std::unordered_set<unsigned __int64>>& effectIdsForSpec, int specIndex) {
+static void removeEffectIdsForSpec(std::unordered_set<unsigned __int64>&idsToFilter, std::unordered_map<int, std::unordered_set<unsigned __int64>>&effectIdsForSpec, int specIndex) {
 	auto effectIdsForSpecRecord = effectIdsForSpec.find(specIndex);
 	if (effectIdsForSpecRecord != effectIdsForSpec.end()) {
 		for (auto id : effectIdsForSpecRecord->second) {
@@ -702,15 +789,23 @@ void SkillIdManager::ResetEffectIdsToFilter() {
 }
 
 __int64 SkillIdManager::SkillShow3KeyHelper::BuildKey(__int32 id_, __int16 variation_id_, __int16 skillskin_id_) {
+#ifdef _BNSEU
 	EU::skillshow3_Record::Key key{};
+#elif _BNSKR
+	KR::skillshow3_Record::Key key{};
+#endif
 	key.id = id_;
 	key.variation_id = variation_id_;
 	key.skillskin_id = skillskin_id_;
 	return std::bit_cast<__int64>(key);
 }
-
+#ifdef _BNSEU
 EU::skillshow3_Record::Key SkillIdManager::SkillShow3KeyHelper::ExtractKey(__int64 key) {
 	EU::skillshow3_Record::Key parts{};
+#elif _BNSKR
+KR::skillshow3_Record::Key SkillIdManager::SkillShow3KeyHelper::ExtractKey(__int64 key) {
+	KR::skillshow3_Record::Key parts{};
+#endif
 	parts.key = key;
 	return parts;
 }
@@ -744,7 +839,11 @@ void SkillIdManager::RestoreEffects() {
 	for (auto& [key, kvp] : effectRestoreList) {
 		auto record = table->__vftable->Find_b8(table, key);
 		if (record == nullptr) continue;
+#ifdef _BNSEU
 		auto effectRecord = (EU::effect_Record*)record;
+#elif _BNSKR
+		auto effectRecord = (KR::effect_Record*)record;
+#endif
 		std::string attribute = "normal_component";
 		if (kvp.contains(attribute)) effectRecord->normal_component[0] = kvp[attribute];
 		attribute = "critical_component";
@@ -765,7 +864,11 @@ void SkillIdManager::RestoreEffects() {
 	for (auto& [key, kvp] : effectSwapRestoreList) {
 		auto record = table->__vftable->Find_b8(table, key);
 		if (record == nullptr) continue;
+#ifdef _BNSEU
 		auto effectRecord = (EU::effect_Record*)record;
+#elif _BNSKR
+		auto effectRecord = (KR::effect_Record*)record;
+#endif
 		std::string attribute = "normal_component";
 		if (kvp.contains(attribute)) effectRecord->normal_component = kvp[attribute];
 		attribute = "critical_component";
@@ -794,8 +897,11 @@ void SkillIdManager::RestoreEffects() {
 	effectRestoreList.clear();
 	effectSwapRestoreList.clear();
 }
-
-void SkillIdManager::RemoveAnimationsForEffect(EU::effect_Record* effectRecord) {
+#ifdef _BNSEU
+void SkillIdManager::RemoveAnimationsForEffect(EU::effect_Record * effectRecord) {
+#elif _BNSKR
+void SkillIdManager::RemoveAnimationsForEffect(KR::effect_Record * effectRecord) {
+#endif
 	if (effectRestoreList.contains(effectRecord->key.key)) return;
 	if (effectSwapRestoreList.contains(effectRecord->key.key)) return;
 	std::string attribute = "normal_component";
@@ -839,8 +945,11 @@ void SkillIdManager::RemoveAnimationsForEffect(EU::effect_Record* effectRecord) 
 		*effectRecord->dispel_show = L'\0';
 	}
 }
-
-void SkillIdManager::SwapAnimationsForEffect(EU::effect_Record* target, EU::effect_Record* animation) {
+#ifdef _BNSEU
+void SkillIdManager::SwapAnimationsForEffect(EU::effect_Record * target, EU::effect_Record * animation) {
+#elif _BNSKR
+void SkillIdManager::SwapAnimationsForEffect(KR::effect_Record * target, KR::effect_Record * animation) {
+#endif
 	if (effectSwapRestoreList.contains(target->key.key)) return;
 	for (auto [attribute, member1, member2] : {
 		std::tuple<std::string, wchar_t*&, wchar_t*&>("normal_component", target->normal_component, animation->normal_component),
@@ -870,9 +979,15 @@ void SkillIdManager::SwapEffects() {
 	if (table == nullptr) return;
 	for (auto& [effectKey, effectSwap] : g_PluginConfig.GetActiveProfile().EffectSwaps) {
 		auto animationKey = effectSwap.AnimationEffectId;
+#ifdef _BNSEU
 		auto effectRecord = (EU::effect_Record*)table->__vftable->Find_b8(table, effectKey);
 		if (effectRecord == nullptr) continue;
 		auto animationRecord = (EU::effect_Record*)table->__vftable->Find_b8(table, animationKey);
+#elif _BNSKR
+		auto effectRecord = (KR::effect_Record*)table->__vftable->Find_b8(table, effectKey);
+		if (effectRecord == nullptr) continue;
+		auto animationRecord = (KR::effect_Record*)table->__vftable->Find_b8(table, animationKey);
+#endif
 		if (animationRecord == nullptr) continue;
 		SwapAnimationsForEffect(effectRecord, animationRecord);
 	}
@@ -893,13 +1008,21 @@ void SkillIdManager::RemoveEffects() {
 		if (filter.IsAlias) continue; //TODO: add alias support
 		auto record = table->__vftable->Find_b8(table, filter.Key);
 		if (record == nullptr) continue;
+#ifdef _BNSEU
 		auto effectRecord = (EU::effect_Record*)record;
+#elif _BNSKR
+		auto effectRecord = (KR::effect_Record*)record;
+#endif
 		RemoveAnimationsForEffect(effectRecord);
 	}
 	for (auto const effectId : effectIdsToFilter) {
 		auto record = table->__vftable->Find_b8(table, effectId);
 		if (record == nullptr) continue;
+#ifdef _BNSEU
 		auto effectRecord = (EU::effect_Record*)record;
+#elif _BNSKR
+		auto effectRecord = (KR::effect_Record*)record;
+#endif
 		RemoveAnimationsForEffect(effectRecord);
 	}
 }
@@ -934,7 +1057,11 @@ const std::unordered_set<int>& SkillIdManager::GetTaxiSkillIds() const {
 
 __int64 SkillIdManager::Skill3KeyHelper::BuildKey(__int32 skillId, signed char variation_id)
 {
+#ifdef _BNSEU
 	EU::skill3_Record::Key key{};
+#elif _BNSKR
+	KR::skill3_Record::Key key{};
+#endif
 	key.id = skillId;
 	key.variation_id = variation_id;
 	return std::bit_cast<__int64>(key);

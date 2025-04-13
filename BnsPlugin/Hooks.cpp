@@ -4,6 +4,7 @@
 #include "Hooks.h"
 #include "PluginConfig.h"
 #include "EU/skillshow3/AAA_skillshow3_RecordBase.h"
+#include "KR/skillshow3/AAA_skillshow3_RecordBase.h"
 #include "SkillIdManager.h"
 #include <cstdint>
 #include <format>
@@ -71,7 +72,11 @@ static void ReloadSkillShow3OnHotkeyPress() {
 			//cycle the cache
 			do {
 				if (!it->_vtptr->IsValid(it)) continue;
+#ifdef _BNSEU
 				if (auto record = (BnsTables::EU::skillshow3_Record*)it->_vtptr->Ptr(it); record == nullptr) continue;
+#elif _BNSKR
+				if (auto record = (BnsTables::KR::skillshow3_Record*)it->_vtptr->Ptr(it); record == nullptr) continue;
+#endif
 			} while (it->_vtptr->Next(it));
 			reloadRequired = false;
 		}
@@ -133,8 +138,11 @@ bool __fastcall hkBUIWorld_ProcessEvent(uintptr_t* This, EInputKeyEvent* InputKe
 	}
 	return oBUIWorld_ProcessEvent(This, InputKeyEvent);
 }
-
+#ifdef _BNSEU
 void RemoveAnimationsForRecord(BnsTables::EU::skillshow3_Record* record)
+#elif _BNSKR
+void RemoveAnimationsForRecord(BnsTables::KR::skillshow3_Record* record)
+#endif
 {
 	auto setToNull = [](wchar_t* member) {
 		*member = L'\0';
@@ -197,7 +205,11 @@ BnsTables::Shared::DrEl* __fastcall hkFind_b8(DrMultiKeyTable* thisptr, unsigned
 	}
 	auto recordBase = oFind_b8(thisptr, key);
 	if (recordBase == nullptr) return oFind_b8(thisptr, key);
+#ifdef _BNSEU
 	auto record = (BnsTables::EU::skillshow3_Record*)recordBase;
+#elif _BNSKR
+	auto record = (BnsTables::KR::skillshow3_Record*)recordBase;
+#endif
 	RemoveAnimationsForRecord(record);
 	reloadRequired = true;
 	return recordBase;
