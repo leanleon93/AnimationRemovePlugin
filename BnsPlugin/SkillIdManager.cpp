@@ -9,6 +9,7 @@
 #include "EU/skill3/skill3_active_skill_Record.h"
 #include "EU/itemskill/AAA_itemskill_RecordBase.h"
 #include "EU/effect_group/AAA_effect_group_RecordBase.h"
+#include "EU/item/item_gem_Record.h"
 #include "EU/BnsTableNames.h"
 
 #include "KR/job/AAA_job_RecordBase.h"
@@ -20,6 +21,7 @@
 #include "KR/skill3/skill3_active_skill_Record.h"
 #include "KR/itemskill/AAA_itemskill_RecordBase.h"
 #include "KR/effect_group/AAA_effect_group_RecordBase.h"
+#include "KR/item/item_gem_Record.h"
 #include "KR/BnsTableNames.h"
 
 #include "PluginConfig.h"
@@ -290,6 +292,48 @@ static bool containsSubstring(const wchar_t* str, const wchar_t* substr) {
 	return s.find(sub) != std::wstring::npos;
 }
 
+void SkillIdManager::AddSoulCoreChildren() {
+	std::unordered_set<int> newIds;
+	for (auto const& id : soulCoreSkills) {
+		auto childIds = GetChildSkillIds(id);
+		newIds.insert(childIds.begin(), childIds.end());
+		auto childIds2 = GetNeoChildSkillIds(id);
+		newIds.insert(childIds2.begin(), childIds2.end());
+		auto childIds3 = GetNeoChildSkillIds2(id);
+		newIds.insert(childIds3.begin(), childIds3.end());
+		auto inheritedIds = GetInheritedIds(id);
+		newIds.insert(inheritedIds.begin(), inheritedIds.end());
+	}
+	soulCoreSkills.insert(newIds.begin(), newIds.end());
+}
+
+void SkillIdManager::SetupSoulCoreSkills() {
+	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
+	if (!versionCheckSuccess.contains(L"item") || !versionCheckSuccess[L"item"]) {
+		return;
+	}
+	const auto table = DataHelper::GetTable(manager, L"item");
+	if (table == nullptr) return;
+	auto innerIter = table->__vftable->createInnerIter_d0(table);
+	std::unordered_set<int> itemSkills;
+	do {
+		if (!innerIter->_vtptr->IsValid(innerIter)) continue;
+		auto baseRecord = innerIter->_vtptr->Ptr(innerIter);
+
+#ifdef _BNSEU
+		if (baseRecord->subtype != EU::item_gem_Record::SubType()) continue;
+		auto record = (EU::item_gem_Record*)baseRecord;
+#elif _BNSKR
+		if (baseRecord->subtype != KR::item_gem_Record::SubType()) continue;
+		auto record = (KR::item_gem_Record*)baseRecord;
+#endif
+		if (record == nullptr || record->gem_type != 8 || record->skill3.Key == 0) continue;
+		soulCoreSkills.insert(Skill3KeyHelper::ExtractId(record->skill3.Key));
+	} while (innerIter->_vtptr->Next(innerIter));
+	table->__vftable->removeInnerIter(table, innerIter);
+	AddSoulCoreChildren();
+}
+
 std::unordered_set<int> SkillIdManager::GetItemSkills(int id) {
 	const auto manager = reinterpret_cast<Data::DataManager*>(*this->dataManagerPtr);
 	if (!versionCheckSuccess.contains(L"itemskill") || !versionCheckSuccess[L"itemskill"]) {
@@ -523,9 +567,11 @@ bool SkillIdManager::SetupEffectIdsForJob(char jobId) {
 bool SkillIdManager::SetupAllSkillIds() {
 	skillIdsForJobMap.clear();
 	globalItemSkillIds.clear();
+	soulCoreSkills.clear();
 	if (this->dataManagerPtr == nullptr || *this->dataManagerPtr == NULL) {
 		return false;
 	}
+	SetupSoulCoreSkills();
 	for (auto const& jobId : jobIds) {
 		if (SetupSkillIdsForJob(jobId)) {
 			SetupEffectIdsForJob(jobId);
@@ -624,21 +670,37 @@ bool SkillIdManager::CompatabilityCheck() {
 }
 
 bool SkillIdManager::Setup() {
-	if (auto successVersionCheck = CompatabilityCheck(); !successVersionCheck) return false;
-	if (!AllVersionsSuccess()) {
-		MessageBox(nullptr, L"AnimFilter version is not 100% compatible with the game version.\nSome Animations might not be removed but your game will not break.\nPlease update the plugin if available.", L"AnimFilter Version Mismatch", MB_OK | MB_ICONWARNING);
+	try {
+		if (auto successVersionCheck = CompatabilityCheck(); !successVersionCheck) return false;
+		if (!AllVersionsSuccess()) {
+			MessageBox(nullptr, L"AnimFilter version is not 100% compatible with the game version.\nSome Animations might not be removed but your game will not break.\nPlease update the plugin if available.", L"AnimFilter Version Mismatch", MB_OK | MB_ICONWARNING);
+		}
+		auto success1 = SetupJobNameMap();
+		if (!success1) return false;
+		auto success2 = SetupAllSkillIds();
+		if (!success2) return false;
+		auto success3 = SetupSkillShowTableId();
+		if (success1 && success2 && success3) {
+			SetupComplete = true;
+			ResetIdsToFilter();
+			ReapplyEffectFilters();
+		}
+		return success1 && success2 && success3;
 	}
-	auto success1 = SetupJobNameMap();
-	if (!success1) return false;
-	auto success2 = SetupAllSkillIds();
-	if (!success2) return false;
-	auto success3 = SetupSkillShowTableId();
-	if (success1 && success2 && success3) {
-		SetupComplete = true;
-		ResetIdsToFilter();
-		ReapplyEffectFilters();
+	catch (const std::exception& ex) {
+		// Log the exception message if needed
+#ifdef _DEBUG
+		std::cerr << "Exception caught in Setup: " << ex.what() << std::endl;
+#endif
+		return false;
 	}
-	return success1 && success2 && success3;
+	catch (...) {
+		// Catch any other types of exceptions
+#ifdef _DEBUG
+		std::cerr << "Unknown exception caught in Setup." << std::endl;
+#endif
+		return false;
+	}
 }
 
 Data::DataManager* SkillIdManager::GetDataManager() {
@@ -708,6 +770,11 @@ void SkillIdManager::ResetIdsToFilter() {
 	//remove all itemskills if set to hide global
 	if (activeProfile.HideGlobalItemSkills) {
 		idsToFilter.insert(globalItemSkillIds.begin(), globalItemSkillIds.end());
+	}
+
+	//remove all soulcores 
+	if (activeProfile.HideSoulCores) {
+		idsToFilter.insert(soulCoreSkills.begin(), soulCoreSkills.end());
 	}
 
 	//remove bardTreeExclusionIds from idsToFilter if not hidetree

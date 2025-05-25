@@ -306,7 +306,7 @@ BnsTables::Shared::DrEl* __fastcall hkFind_b8(DrMultiKeyTable* thisptr, unsigned
 	const auto& ids = g_SkillIdManager.GetIdsToFilter();
 	const auto skillId = static_cast<int32_t>(key);
 
-#ifdef _SKILLSWAP2
+#ifdef _SKILLSWAP
 	const auto& profile = g_PluginConfig.GetActiveProfile();
 	if (const auto& swap = profile.AnimationSwaps.find(skillId); swap != profile.AnimationSwaps.end()) {
 		auto animationSwapKey = SkillIdManager::SkillShow3KeyHelper::BuildKey(swap->second.AnimationSkillId, (short)swap->second.AnimationSkillVariation, 0);

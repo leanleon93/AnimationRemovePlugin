@@ -107,6 +107,7 @@ private:
 	std::unordered_set<char> jobIds;
 	std::unordered_map<std::wstring, char> jobNameMap;
 	std::unordered_set<int> globalItemSkillIds;
+	std::unordered_set<int> soulCoreSkills;
 	std::unordered_map<char, SkillIdsForJob> skillIdsForJobMap;
 	std::unordered_map<char, EffectIdsForJob> effectIdsForJobMap;
 	std::unordered_set<int> GetAllSkillIdsFromJobMap();
@@ -135,6 +136,8 @@ private:
 	void SwapAnimationsForEffect(BnsTables::KR::effect_Record* target, BnsTables::KR::effect_Record* animation);
 	void RemoveAnimationsForEffect(BnsTables::KR::effect_Record* effectRecord);
 #endif
+	void SetupSoulCoreSkills();
+	void AddSoulCoreChildren();
 	std::unordered_set<int> GetInheritedIds(int id);
 	void AddChildrenSkillIds(SkillIdsForJob& skillIdsForJobEntry);
 	std::unordered_set<int> GetNeoChildSkillIds(int id);
@@ -160,7 +163,8 @@ private:
 		L"skill-inheritance",
 		L"effect-group",
 		L"skillbookcatalogueitem",
-		L"skill-train-by-item"
+		L"skill-train-by-item",
+		L"item"
 	};
 
 	std::unordered_map<std::wstring, bool> versionCheckSuccess = {
@@ -173,7 +177,8 @@ private:
 		{ L"skill-inheritance", false },
 		{ L"effect-group", false },
 		{ L"skillbookcatalogueitem", false },
-		{ L"skill-train-by-item", false }
+		{ L"skill-train-by-item", false },
+		{ L"item", false}
 	};
 
 	const std::unordered_set<char> jobIdsFallback = {
