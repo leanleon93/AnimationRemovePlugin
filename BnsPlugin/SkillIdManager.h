@@ -74,7 +74,9 @@ private:
 
 	const std::unordered_set<int> wlTDExclusionIds = {
 		171200,
-		173000
+		173000,
+		171168,
+		171169
 	};
 
 	const std::unordered_set<int> defaultTaxiExclusionIds = {
