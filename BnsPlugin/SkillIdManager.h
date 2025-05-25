@@ -80,13 +80,25 @@ private:
 	const std::unordered_set<int> defaultTaxiExclusionIds = {
 		141190,
 		142190,
-		143290
+		143290,
+		142270,
+		142271,
+		142272,
+		142280,
+		142281,
+		142282
 	};
 
 	const std::unordered_map<__int32, __int16> taxiExclusionIdVariations = {
 		{ 141190, 9 },
 		{ 142190, 9 },
-		{ 143290, 5 }
+		{ 143290, 5 },
+		{ 142270, 1 },
+		{ 142271, 1 },
+		{ 142272, 1 },
+		{ 142280, 1 },
+		{ 142281, 1 },
+		{ 142282, 1 }
 	};
 
 	const std::unordered_map<char, EffectIdsForJob> fixedTargetEffectIds = {
