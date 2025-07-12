@@ -3,7 +3,7 @@
     <enabled value="true" />
     <options>
         <!-- Reload Config Keybind [SHIFT + ALT + 9]-->
-        <option name="reloadKey" keyCode="39" bCtrl="0" bShift="1" bAlt="1" />
+        <option name="reloadKey" keyCode="50" bCtrl="0" bShift="1" bAlt="1" />
         <!-- Profile 1 Keybind [SHIFT + ALT + 1]-->
         <option name="profile_1" keyCode="31" bCtrl="0" bShift="1" bAlt="1" />
         <!-- Profile 2 Keybind [SHIFT + ALT + 2]-->
@@ -17,10 +17,10 @@
     </options>
     <profiles>
         <profile name="1">
-            <text>Only Gun</text>
-            <extra_options hideItemSkills="true" />
+            <text>Only WL</text>
             <effect_options>
             </effect_options>
+            <extra_options hideSoulCores="true" />
             <skill_options>
                 <option name="Blade Master" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
                 <option name="Kung Fu Master" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
@@ -29,9 +29,9 @@
                 <option name="Assassin" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
                 <option name="Summoner" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
                 <option name="Blade Dancer" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
-                <option name="Warlock" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
+                <option name="Warlock" hideSpec1="false" hideSpec2="false" hideSpec3="false" />
                 <option name="Soul Fighter" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
-                <option name="Gunslinger" hideSpec1="false" hideSpec2="false" hideSpec3="false" />
+                <option name="Gunslinger" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
                 <option name="Warden" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
                 <option name="Zen Archer" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
                 <option name="Astromancer" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
@@ -40,9 +40,11 @@
             </skill_options>
         </profile>
         <profile name="2">
-            <text>Only Gun 3rd</text>
+            <text>Only BD</text>
             <effect_options>
+                <!-- <option key="59301115" /> -->
             </effect_options>
+            <extra_options hideSoulCores="true" />
             <skill_options>
                 <option name="Blade Master" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
                 <option name="Kung Fu Master" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
@@ -50,21 +52,59 @@
                 <option name="Destroyer" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
                 <option name="Assassin" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
                 <option name="Summoner" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
-                <option name="Blade Dancer" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
+                <option name="Blade Dancer" hideSpec1="false" hideSpec2="false" hideSpec3="false" />
                 <option name="Warlock" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
                 <option name="Soul Fighter" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
-                <option name="Gunslinger" hideSpec1="true" hideSpec2="true" hideSpec3="false" />
+                <option name="Gunslinger" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
                 <option name="Warden" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
                 <option name="Zen Archer" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
                 <option name="Astromancer" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
                 <option name="Dual Blade" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
                 <option name="Musician" hideSpec1="true" hideSpec2="true" hideSpec3="true" />
             </skill_options>
+            <effect_swap_options>
+                <!-- <option targetEffectId="27115535" animationEffectId="59301115" /> -->
+            </effect_swap_options>
+            <swap_options>
+                <!-- Wind Sever -->
+                <option targetSkillId="165100" animationSkillId="165130"
+                    animationSkillVariation="1" />
+                <option targetSkillId="165101" animationSkillId="165131" animationSkillVariation="1" />
+                <option targetSkillId="165102" animationSkillId="165132" animationSkillVariation="1" />
+                <option targetSkillId="165103" animationSkillId="165133" animationSkillVariation="1" />
+                <option targetSkillId="165104" animationSkillId="165134" animationSkillVariation="1" />
+
+                <!-- Typhoon -->
+                <!-- <option targetSkillId="165140" animationSkillId="165153"
+                    animationSkillVariation="1" />
+                <option targetSkillId="165141" animationSkillId="165154" animationSkillVariation="1" />
+                <option targetSkillId="165142" animationSkillId="165155" animationSkillVariation="1" /> -->
+
+                <!-- Sicko Mode -->
+                <!-- <option targetSkillId="165100" animationSkillId="165161"
+                animationSkillVariation="1" />
+                <option targetSkillId="165101" animationSkillId="165161" animationSkillVariation="1" />
+                <option targetSkillId="165102" animationSkillId="165161" animationSkillVariation="1" />
+                <option targetSkillId="165103" animationSkillId="165161" animationSkillVariation="1" />
+                <option targetSkillId="165104" animationSkillId="165161" animationSkillVariation="1" /> -->
+
+                <!-- Sicko Mode 2 -->
+                <!-- <option targetSkillId="165140" animationSkillId="165161"
+                animationSkillVariation="1" />
+                <option targetSkillId="165141" animationSkillId="165161" animationSkillVariation="1" />
+                <option targetSkillId="165142" animationSkillId="165161" animationSkillVariation="1" /> -->
+
+                <!-- White Wind -->
+                <option targetSkillId="165491" animationSkillId="165495" animationSkillVariation="1" />
+
+            </swap_options>
         </profile>
         <profile name="3">
             <text>Show Everything</text>
             <effect_options>
+                <option key="59301115" />
             </effect_options>
+            <extra_options hideSoulCores="false" />
             <skill_options>
                 <option name="Blade Master" hideSpec1="false" hideSpec2="false" hideSpec3="false" />
                 <option name="Kung Fu Master" hideSpec1="false" hideSpec2="false" hideSpec3="false" />
@@ -82,6 +122,23 @@
                 <option name="Dual Blade" hideSpec1="false" hideSpec2="false" hideSpec3="false" />
                 <option name="Musician" hideSpec1="false" hideSpec2="false" hideSpec3="false" />
             </skill_options>
+            <effect_swap_options>
+                <option targetEffectId="59301104" animationEffectId="59087834" />
+                <!-- <option targetEffectId="59301115" animationEffectId="59263034 " /> -->
+            </effect_swap_options>
+            <swap_options>
+                <!-- Wingstorm -->
+                <option targetSkillId="172244" animationSkillId="172283" animationSkillVariation="1" />
+                <option targetSkillId="172245" animationSkillId="172284" animationSkillVariation="1" />
+                <!-- Bombardment -->
+                <option targetSkillId="172024" animationSkillId="172029" animationSkillVariation="1" />
+                <option targetSkillId="172025" animationSkillId="172030" animationSkillVariation="1" />
+                <option targetSkillId="172026" animationSkillId="172031" animationSkillVariation="1" />
+                <option targetSkillId="172027" animationSkillId="172032" animationSkillVariation="1" />
+                <!-- Imprison -->
+                <option targetSkillId="171193" animationSkillId="172281" animationSkillVariation="1" />
+
+            </swap_options>
         </profile>
         <profile name="4">
             <text>Hide Everything</text>
@@ -129,7 +186,7 @@
                 <option name="Musician" hideSpec1="false" hideSpec2="false" hideSpec3="false" />
             </skill_options>
             <swap_options>
-                <option targetSkillId="194420" animationSkillId="193040" animationSkillVariation="1" />
+                <option targetSkillId="171000" animationSkillId="172277" animationSkillVariation="1" />
             </swap_options>
         </profile>
     </profiles>

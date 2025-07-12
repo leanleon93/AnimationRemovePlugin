@@ -1,7 +1,7 @@
 # BnS AnimeFilter (▰˘◡˘▰)
 (anime not included)
 
-## A Blade & Soul plugin to show/hide the skills for specific classes/specializations to provide a cleaner screen in combat without hiding party members.
+## A Blade & Soul NEO plugin to show/hide the skills for specific classes/specializations to provide a cleaner screen in combat without hiding party members.
 
 ## Features
 - Show/hide skills for specific classes/specializations.
@@ -21,7 +21,8 @@ You can set extra options for a profile.
 - Hide Bard tree
 - Hide Assassin taxi
 - Hide Time Distortion
+- Hide Soulcores
 ```xml
-<extra_options hideTree="true" hideTaxi="true" hideTD="true" />
+<extra_options hideSoulCores="true" hideTree="true" hideTaxi="true" hideTD="true" />
 ```
 Remove the options you dont want.
