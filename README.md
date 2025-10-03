@@ -1,3 +1,5 @@
+[DEPRECATED] Use new [BnsDatafilePlugin_AnimationRemover](https://github.com/leanleon93/BnsDatafilePlugin_AnimationRemover) instead.
+
 # BnS AnimeFilter (▰˘◡˘▰)
 (anime not included)
 
